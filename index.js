@@ -28,17 +28,49 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+function getSimilarTimes(arr1, arr2){
+  var returnArray = []
+  var unrepArr = []
+
+
+  arr1.forEach((e1)=> {
+    if(arr1.some(e1 => arr2.includes(e1)) == true){
+  returnArray.push(e1);
+    }
+  })
+
+
+  return returnArray[getRandomInt(0,returnArray.length-1)]
+  }
+
+
+
 function getRandomSolution(callback) {
   var solution = {
      a: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+     aT: [],
      b: Math.floor(Math.random() * (3 - 0 + 1) + 0),
-     c: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+     bT: [],
+      c: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+     cT:[],
      d: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+     dT:[],
      e: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+     eT:[],
      f: Math.floor(Math.random() * (3 - 0 + 1) + 0),
-     g: Math.floor(Math.random() * (3 - 0 + 1) + 0)
+     fT: [],
+     g: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+     gT: []
 
    }
+
+   solution.aT = getSimilarTimes(workers[solution.a], j1)
+   solution.bT = getSimilarTimes(workers[solution.b], j2)
+   solution.cT = getSimilarTimes(workers[solution.c], j3)
+   solution.dT = getSimilarTimes(workers[solution.d], j4)
+   solution.eT = getSimilarTimes(workers[solution.e], j5)
+   solution.fT = getSimilarTimes(workers[solution.f], j6)
+   solution.gT = getSimilarTimes(workers[solution.g], j7)
   callback(solution)
 }
 function fitness(solution, callback) {
@@ -72,46 +104,67 @@ function crossover(parent1, parent2, callback) {
   var child = {}
   if (Math.random()>0.5) {
     child.a = parent1.a
+    child.aT = parent1.aT
   }
   else {
     child.a = parent2.a
+    child.aT = parent2.aT
   }
   if (Math.random()>0.5) {
     child.b = parent1.b
+    child.bT = parent1.bT
+
   }
   else {
     child.b = parent2.b
+    child.bT = parent2.bT
+
   }
   if (Math.random()>0.5) {
     child.c = parent1.c
+    child.cT = parent1.cT
+
   }
   else {
     child.c = parent2.c
+    child.cT = parent2.cT
   }
   if (Math.random()>0.5) {
     child.d = parent1.d
+    child.dT = parent1.dT
+
   }
   else {
     child.d = parent2.d
+    child.dT = parent2.dT
+
   }
   if (Math.random()>0.5) {
     child.e = parent1.e
+    child.eT = parent1.eT
+
     }
   else {
     child.e = parent2.e
+    child.eT = parent2.eT
+
     }
-  if (Math.random()>0.5) {
-    child.f = parent1.f
+    if (Math.random()>0.5) {
+      child.f = parent1.f
+      child.fT = parent1.fT
       }
-  else {
-    child.f = parent2.f
+    else {
+      child.f = parent2.f
+      child.fT = parent1.fT
       }
-  if (Math.random()>0.5) {
+    if (Math.random()>0.5) {
     child.g = parent1.g
-          }
+    child.gT = parent1.gT
+  }
   else {
     child.g = parent2.g
-          }
+    child.gT = parent2.gT
+  }
   callback(child)
 }
 
@@ -164,7 +217,7 @@ var t = new Task(options)// t.on('run start', function () { console.log('run sta
 //  t.on('find sum', function () { console.log('find sum') })
 // t.on('find sum end', function (sum) { console.log('find sum end', sum) })
 
-//t.on('statistics', function (statistics) { console.log('statistics',statistics)})
+t.on('statistics', function (statistics) { console.log('statistics',statistics)})
 // //
 // t.on('normalize start', function () { console.log('normalize start') })
 // t.on('normalize end', function (normalized) { console.log('normalize end',normalized) })

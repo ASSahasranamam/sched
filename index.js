@@ -13,7 +13,7 @@ var Task = genetic.Task
             }
     , util = require('util')
 
-var workers = [[10],[8,9,10,11],[7,8,9,10],[8]];
+var workers = [[10,11],[7,8,9,10,11],[7,8,9,10],[8]];
 
 var j = [[7], [7],[8,9][8],[11],[10],[11]];
 var j1 = [7];
@@ -23,6 +23,8 @@ var j4 = [8];
 var j5 = [11];
 var j6=[10];
 var j7 = [11];
+
+var priority = [1.5, 0.5, 1, 0.5 ,1.5, 0.5, 0.5]
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -128,7 +130,7 @@ function fitness(solution, callback) {
     for (j=0;j<mechAssn.length;j++){
       for (k=j+1;k<mechAssn.length;k++){
         if (k!=j && mechAssn[k] == mechAssn[j] && timeAssn[k] === timeAssn[j]){
-            score = score-1;
+            score = score- 1;
           }
 
       }

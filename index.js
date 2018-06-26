@@ -6,9 +6,9 @@ var Task = genetic.Task
             , stopCriteria : stopCriteria
             , fitness : fitness
             , minimize : false
-            , mutateProbability : 0.1
+            , mutateProbability : 0.05
             , mutate : mutate
-            , crossoverProbability : 0.3
+            , crossoverProbability : 0.5
             , crossover : crossover
             }
     , util = require('util')
@@ -71,6 +71,7 @@ function getRandomSolution(callback) {
    solution.eT = getSimilarTimes(workers[solution.e], j5)
    solution.fT = getSimilarTimes(workers[solution.f], j6)
    solution.gT = getSimilarTimes(workers[solution.g], j7)
+
   callback(solution)
 }
 function fitness(solution, callback) {
@@ -97,6 +98,42 @@ function fitness(solution, callback) {
   if(workers[solution.g].some(ele => j7.includes(ele)) == true){
     score = score+1;
   }
+
+  if(j1.includes(solution.aT) == true){
+    score = score+1;
+  }
+  if(j2.includes(solution.bT) == true){
+    score = score+1;
+  }
+  if(j3.includes(solution.cT) == true){
+    score = score+1;
+  }
+  if(j4.includes(solution.dT) == true){
+    score = score+1;
+  }
+  if(j5.includes(solution.eT) == true){
+      score = score+1;
+    }
+  if(j6.includes(solution.fT) == true){
+      score = score+1;
+    }
+  if(j7.includes(solution.gT) == true){
+      score = score+1;
+    }
+
+    var simInd = []
+    var mechAssn = [solution.a,solution.b,solution.c,solution.d,solution.e,solution.f,solution.g]
+    var timeAssn = [solution.aT,solution.bT,solution.cT,solution.dT,solution.eT,solution.fT,solution.gT]
+
+    for (j=0;j<mechAssn.length;j++){
+      for (k=j+1;k<mechAssn.length;k++){
+        if (k!=j && mechAssn[k] == mechAssn[j] && timeAssn[k] === timeAssn[j]){
+            score = score-1;
+          }
+
+      }
+    }
+
   callback(score)
 }
 
@@ -191,12 +228,39 @@ function mutate(solution, callback) {
     solution.g = Math.floor(Math.random() * (3 - 0 + 1) + 0)
   }
 
+
+    if (Math.random()<0.3) {
+      solution.aT = getSimilarTimes(workers[solution.a], j1)
+    }
+    if (Math.random()<0.3) {
+      solution.bT = getSimilarTimes(workers[solution.b], j2)
+    }
+    if (Math.random()<0.3) {
+      solution.cT = getSimilarTimes(workers[solution.c], j3)
+
+    }
+    if (Math.random()<0.3) {
+      solution.dT = getSimilarTimes(workers[solution.d], j4)
+        }
+    if (Math.random()<0.3) {
+      solution.eT = getSimilarTimes(workers[solution.e], j5)
+    }
+    if (Math.random()<0.3) {
+      solution.fT = getSimilarTimes(workers[solution.f], j6)
+      }
+
+    if (Math.random()<0.3) {
+      solution.gT = getSimilarTimes(workers[solution.g], j7)
+    }
+
+
+
   callback(solution)
 }
 
 
 function stopCriteria() {
-  return (this.generation == 1000)
+  return (this.generation == 1000);
 }
 
 console.log('=== TEST BEGINS === ')
@@ -215,9 +279,9 @@ var t = new Task(options)// t.on('run start', function () { console.log('run sta
 // t.on('reproduction start', function () { console.log('reproduction start') })
 //
 //  t.on('find sum', function () { console.log('find sum') })
-// t.on('find sum end', function (sum) { console.log('find sum end', sum) })
+ //t.on('find sum end', function (sum) { console.log('find sum end', sum) })
 
-t.on('statistics', function (statistics) { console.log('statistics',statistics)})
+//t.on('statistics', function (statistics) { console.log('statistics',statistics)})
 // //
 // t.on('normalize start', function () { console.log('normalize start') })
 // t.on('normalize end', function (normalized) { console.log('normalize end',normalized) })
@@ -232,4 +296,7 @@ t.on('statistics', function (statistics) { console.log('statistics',statistics)}
 // t.on('reproduction end', function (children) { console.log('reproduction end',children) })
 
 t.on('error', function (error) { console.log('ERROR - ', error) })
-t.run(function (stats) { console.log('results', stats); })
+t.run(function (stats) { console.log('results', stats);
+
+console.log("Max", stats.max);
+ })

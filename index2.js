@@ -13,18 +13,29 @@ var Task = genetic.Task
             }
     , util = require('util')
 
-var workers = [[10,11],[7,8,9,10,11],[7,8,9,10],[8]];
+var workers = [[10,11],[7,8,9,10,11],[7,8,9,10,11],[8,9]];
 
-var j  = [[7],[7],[8,9],[8],[11],[10],[11]];
+var j  = [[7],[7],[8,9],[8],[11],[10,11],[11]];
+var duration = [1,1,2,1,1,2,1];
+var predecessor = [0,1,0,0,2,1,1];
+
 var j1 = [7];
 var j2 = [7];
 var j3 = [8,9];
 var j4 = [8];
 var j5 = [11];
-var j6 = [10];
+var j6 = [10,11];
 var j7 = [11];
 
 var priority = [1.5, 0.5, 1, 0.5 ,1.5, 0.5, 0.5]
+var workerTimes = []
+
+
+for(var i =0;i<workers.length;i++){
+  workerTimes.push(workers[i].length);
+}
+
+console.log(j.typeOf);
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -79,7 +90,7 @@ function getRandomSolution(callback) {
 function fitness(solution, callback) {
 //  console.log(solution);
   var score = 0;
-    if(workers[solution.a].some(ele => j1.includes(ele)) == true){
+  if(workers[solution.a].some(ele => j1.includes(ele)) == true){
     score = score+1;
   }
   if(workers[solution.b].some(ele => j2.includes(ele)) == true){
@@ -130,10 +141,69 @@ function fitness(solution, callback) {
     for (j=0;j<mechAssn.length;j++){
       for (k=j+1;k<mechAssn.length;k++){
         if (k!=j && mechAssn[k] == mechAssn[j] && timeAssn[k] === timeAssn[j]){
-            score = score- 1;
+            score = score - 1;
           }
 
       }
+    }
+
+    for (j=0;j<mechAssn.length;j++){
+      for (k=j+1;k<mechAssn.length;k++){
+        if ((k!=j && mechAssn[k] == mechAssn[j]) && ( timeAssn[k] < (timeAssn[j])&& ((timeAssn[k] + duration[k]) )> timeAssn[j] ) ){
+            score = score - 1;
+          }
+
+      }
+    }
+
+    if(workerTimes[solution.a] === duration[0] && (workers[solution.a][0] === j1[0]) ){
+        score=score+1;
+    }
+    if(workerTimes[solution.b] === duration[1] && (workers[solution.b][0] === j2[0])){
+        score=score+1;
+    }
+    if(workerTimes[solution.c] === duration[2] && (workers[solution.c][0] === j3[0])){
+        score=score+1;
+    }
+    if(workerTimes[solution.d] === duration[3] && (workers[solution.d][0] === j4[0])){
+        score=score+1;
+    }
+    if(workerTimes[solution.e] === duration[4] && (workers[solution.e][0] === j5[0])){
+        score=score+1;
+    }
+    if(workerTimes[solution.f] === duration[5] && (workers[solution.f][0] === j6[0])){
+        score=score+1;
+    }
+    if(workerTimes[solution.g] === duration[6] && (workers[solution.g][0] === j7[0])){
+        score=score+1;
+    }
+
+    if(workerTimes[solution.a] >= duration[0] && ( solution.aT + duration[0]  <= 1 + j1[(j1.length-1)])){
+        score=score+1;
+    }
+
+    if(workerTimes[solution.b] >= duration[1] && ( solution.bT + duration[1]  <= 1 + j2[(j2.length-1)])){
+        score=score+1;
+    }
+
+    if(workerTimes[solution.c] >= duration[2] && ( solution.cT + duration[2]  <= 1 + j3[(j3.length-1)])){
+        score=score+1;
+    }
+
+    if(workerTimes[solution.d] >= duration[3] && ( solution.dT + duration[3]  <= 1 + j4[(j4.length-1)])){
+        score=score+1;
+    }
+
+    if(workerTimes[solution.e] >= duration[4] && ( solution.eT + duration[4]  <= 1 + j5[(j5.length-1)])){
+            score=score+1;
+        }
+
+    if(workerTimes[solution.f] >= duration[5]  && ( solution.fT + duration[5] <= 1 + j6[(j6.length-1)])){
+            score=score+1;
+        }
+
+    if(workerTimes[solution.g] >= duration[6] && ( solution.gT + duration[6]  <= 1 + j7[(j7.length-1)])){
+        score=score+1
     }
 
   callback(score)
@@ -266,8 +336,9 @@ function stopCriteria() {
 }
 
 console.log('=== TEST BEGINS === ')
-var t = new Task(options)// t.on('run start', function () { console.log('run start'); util.log('run') })
-//  t.on('run finished', function (results) { console.log('run finished - ', results); util.log('run')})
+var t = new Task(options)
+  t.on('run start', function () { console.log('run start'); util.log('run') })
+  t.on('run finished', function (results) { console.log('run finished - ', results); util.log('run')})
 // t.on('init start', function () { console.log('init start') })
 // t.on('init end', function (pop) { console.log('init end', pop) })
 // t.on('loop start', function () { console.log('loop start') })
@@ -276,14 +347,14 @@ var t = new Task(options)// t.on('run start', function () { console.log('run sta
 // t.on('iteration end', function () { console.log('iteration end') })
 // t.on('calcFitness start', function () { console.log('calcFitness start') })
 // t.on('calcFitness end', function (pop) { console.log('calcFitness end', pop) })
- t.on('parent selection start', function () { console.log('parent selection start') })
- t.on('parent selection end', function (parents) { console.log('parent selection end ',parents) })
+// t.on('parent selection start', function () { console.log('parent selection start') })
+// t.on('parent selection end', function (parents) { console.log('parent selection end ',parents) })
 // t.on('reproduction start', function () { console.log('reproduction start') })
 //
 //  t.on('find sum', function () { console.log('find sum') })
  //t.on('find sum end', function (sum) { console.log('find sum end', sum) })
 
-//t.on('statistics', function (statistics) { console.log('statistics',statistics)})
+t.on('statistics', function (statistics) { console.log('statistics',statistics)})
 // //
 // t.on('normalize start', function () { console.log('normalize start') })
 // t.on('normalize end', function (normalized) { console.log('normalize end',normalized) })
@@ -300,5 +371,5 @@ var t = new Task(options)// t.on('run start', function () { console.log('run sta
 t.on('error', function (error) { console.log('ERROR - ', error) })
 t.run(function (stats) { console.log('results', stats);
 
-console.log("Max", stats.max);
+console.log("Max", stats.max.gT);
  })

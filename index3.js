@@ -139,7 +139,7 @@ function fitness(solution, callback) {
     var timeAssn = [solution.aT,solution.bT,solution.cT,solution.dT,solution.eT,solution.fT,solution.gT]
 
     for (j=0;j<mechAssn.length;j++){
-      for (k=j+1;k<mechAssn.length;k++){
+      for (k=0;k<mechAssn.length;k++){
         if (k!=j && mechAssn[k] == mechAssn[j] && timeAssn[k] === timeAssn[j]){
             score = score - 1;
           }
@@ -148,10 +148,13 @@ function fitness(solution, callback) {
     }
 
     for (j=0;j<mechAssn.length;j++){
-      for (k=j+1;k<mechAssn.length;k++){
-        if ((k!=j && mechAssn[k] == mechAssn[j]) && ( timeAssn[k] < (timeAssn[j])&& ((timeAssn[k] + duration[k]) )> timeAssn[j] ) ){
+      for (k=0;k<mechAssn.length;k++){
+        if (k!=j && mechAssn[k] == mechAssn[j]) {
+          if( timeAssn[k] < timeAssn[j] && ((timeAssn[k] + duration[k]) > timeAssn[j] ) ){
             score = score - 1;
           }
+
+        }
 
       }
     }
@@ -332,7 +335,7 @@ function mutate(solution, callback) {
 
 
 function stopCriteria() {
-  return (this.generation == 1000);
+  return (this.generation == 3000);
 }
 
 console.log('=== TEST BEGINS === ')
@@ -354,7 +357,7 @@ var t = new Task(options)
 //  t.on('find sum', function () { console.log('find sum') })
  //t.on('find sum end', function (sum) { console.log('find sum end', sum) })
 
-t.on('statistics', function (statistics) { console.log('statistics',statistics)})
+//t.on('statistics', function (statistics) { console.log('statistics',statistics)})
 // //
 // t.on('normalize start', function () { console.log('normalize start') })
 // t.on('normalize end', function (normalized) { console.log('normalize end',normalized) })
@@ -369,7 +372,7 @@ t.on('statistics', function (statistics) { console.log('statistics',statistics)}
 // t.on('reproduction end', function (children) { console.log('reproduction end',children) })
 
 t.on('error', function (error) { console.log('ERROR - ', error) })
-t.run(function (stats) { console.log('results', stats);
+t.run(function (stats) { //console.log('results', stats);
 
 console.log("Max", stats.max.gT);
  })

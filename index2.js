@@ -149,8 +149,8 @@ function fitness(solution, callback) {
 
     for (j=0;j<mechAssn.length;j++){
       for (k=j+1;k<mechAssn.length;k++){
-        if ((k!=j && mechAssn[k] == mechAssn[j]) && ( timeAssn[k] < (timeAssn[j])&& ((timeAssn[k] + duration[k]) )> timeAssn[j] ) ){
-            score = score - 1;
+        if ((k!=j && mechAssn[k] == mechAssn[j]) && ( timeAssn[j] < (timeAssn[k]+ duration[k])) ){
+            score = score + 1;
           }
 
       }

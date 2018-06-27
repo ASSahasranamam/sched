@@ -13,14 +13,14 @@ var Task = genetic.Task
             }
     , util = require('util')
 
-var workers = [[10,11],[7,8,9,10,11],[7,8,9,10,11],[8,9]];
+var workers = [[10,11],[7,8,9,10,11],[7,8,9,10,11],[1,2]];
 
 var j  = [[7],[7],[8,9],[8],[11],[10,11],[11]];
 var duration = [1,1,2,1,1,2,1];
 var predecessor = [0,1,0,0,2,1,1];
 
-var j1 = [7];
-var j2 = [7];
+var j1 = [3];
+var j2 = [4];
 var j3 = [8,9];
 var j4 = [8];
 var j5 = [11];

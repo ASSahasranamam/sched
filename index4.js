@@ -19,18 +19,45 @@ var Task = genetic.Task,
 
 // Worker Availability hours Start Times (Every Hour)
 
-
+// var workers = [
+//   [
+//     [moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")],
+//     [moment("2010-10-20 13:00", "YYYY-MM-DD HH:mm"),moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
+//   ],
+//
+//   [
+//     [moment("2010-10-21 07:59", "YYYY-MM-DD HH:mm"),
+//     moment("2010-10-21 09:59", "YYYY-MM-DD HH:mm")],
+//     [moment("2010-10-20 18:00", "YYYY-MM-DD HH:mm"),
+//     moment("2010-10-20 22:00", "YYYY-MM-DD HH:mm")]
+//   ]
+// ]
 var workers = [
-  [
-    moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-    moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
-  ],
 
   [
-    moment("2010-10-21 08:00", "YYYY-MM-DD HH:mm"),
-    moment("2010-10-21 09:00", "YYYY-MM-DD HH:mm"),
-    moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-    moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
+    { //worker0
+      start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
+    }, {
+      start: moment("2010-10-20 02:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
+    }
+  ],
+  [
+    { //worker1
+      start: moment("2010-10-20 13:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
+    }, {
+      start: moment("2010-10-21 08:00 ", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
+    }
+  ],
+  [
+    { //worker2
+      id: 3,
+      start: moment("2010-10-20 08:00 ", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
+    }
   ]
 ]
 
@@ -39,16 +66,8 @@ var workers = [
 
 // var j  = [[7],[7],[8,9],[8],[11],[10,11],[11]];
 //Duration of Task in Hours
+var duration =[1,1,2];
 
-var duration = [
-  1,
-  1,
-  2,
-  1,
-  1,
-  2,
-  1
-];
 var predecessor = [
   0,
   1,
@@ -60,34 +79,47 @@ var predecessor = [
 ];
 
 //Machine Availability times Start Times (Every Hour)
-var j1 = [
-  moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-  moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
-];
-var j2 = [
-  moment("2010-10-21 8:00", "YYYY-MM-DD HH:mm"),
-  moment("2010-10-21 9:00", "YYYY-MM-DD HH:mm")
-];
-var j3 = [
-  moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-  moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
-];
+var j1 = {
+  duration: 1,
+  data: [
+    {
+      start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
+    }
+  ]
+};
 
-// var j2 = [7];
-// var j3 = [8,9];
-// var j4 = [8];
-// var j5 = [11];
-// var j6 = [10,11];
-// var j7 = [11];
+var j2 = {
+  duration: 1,
+  data: [
+    {
+      start: moment("2010-10-21 08:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-21 09:00", "YYYY-MM-DD HH:mm")
+    }, {
+      start: moment("2010-10-21 18:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-21 21:00", "YYYY-MM-DD HH:mm")
+    }
+  ]
+};
+
+var j3 = {
+  duration: 2,
+  data: [
+    {
+      start: moment("2010-10-20 14:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
+    }
+  ]
+};
 
 //How many Hours are the workers available?
-var workerTimes = []
+// var workerTimes = []
+// for (var i = 0; i < workers.length; i++) {
+//   workerTimes.push(workers[i].length);
+// }
 
-for (var i = 0; i < workers.length; i++) {
-  workerTimes.push(workers[i].length);
-}
+// duration(j.typeOf);
 
-// console.log(j.typeOf);
 //Gives a random value including of min range and ONLY LESSER THAN the max limit
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -96,24 +128,22 @@ function getRandomInt(min, max) {
 //Returns a random hour during which both the worker and machine are available
 function getSimilarTimes(arr1, arr2) {
   var returnArray = []
-  var unrepArr = []
 
-  for (var i = 0; i < arr1.length; i++) {
-    for (var a = 0; a < arr2.length; a++) {
-      if (arr1[i].isSame(arr2[a])) {
-        returnArray.push(arr1[i])
-      }
-    }
+          for (var i = 0; i < arr1.length; i++) {
+            for (var a = 0; a < arr2.data.length; a++) {
+              if (moment(arr1[i].start).isSameOrBefore(moment(arr2.data[a].start)) && (moment(arr1[i].end).isSameOrAfter(moment(arr2.data[a].start).add(arr2.duration, "h")))) {
+
+                if (moment(arr1[i].start).isSameOrAfter(moment(arr2.data[a].start))) {
+                  returnArray.push(arr1[i].start)
+                } else {
+                  returnArray.push(arr2.data[a].start)
+                }
+              }
+              console.log(returnArray)
+            }
   }
-  //
-  // arr1.forEach((e1)=> {
-  //   if(arr1.some(e1 => arr2.includes(e1)) == true){
-  //     isSame
-  // returnArray.push(e1);
-  //   }
-  // })
 
-  console.log(returnArray)
+  //console.log(returnArray)
   if (returnArray.length == 1) {
     return returnArray[0];
   } else if (returnArray.length == 0) {
@@ -155,7 +185,7 @@ function getRandomSolution(callback) {
 }
 function fitness(solution, callback) {
   //  console.log(solution);
-  var score = 0;
+  var score = 10;
   // if(workers[solution.a].some(ele => j1.includes(ele)) == true){
   //   score = score+1;
   // }
@@ -180,7 +210,7 @@ function fitness(solution, callback) {
   for (var i of workers[solution.a]) {
     //console.log(solution.aT)
     // if( typeof solution.aT != "undefined"){
-    if (solution.aT.isSame(i)) {
+    if (solution.aT.isSame(i.start)) {
       score = score + 1;
       // }
     }
@@ -188,7 +218,7 @@ function fitness(solution, callback) {
   for (var i of workers[solution.b]) {
     //  console.log(solution.bT)
     // if( typeof solution.aT != "undefined"){
-    if (solution.bT.isSame(i)) {
+    if (solution.bT.isSame(i.start)) {
       score = score + 1;
       // }
     }
@@ -196,21 +226,45 @@ function fitness(solution, callback) {
   for (var i of workers[solution.c]) {
     //console.log(solution.aT)
     // if( typeof solution.aT != "undefined"){
-    if (solution.cT.isSame(i)) {
+    if (solution.cT.isSame(i.start)) {
+      score = score + 1;
+      // }
+    }
+  }
+  for (var i of j1.data) {
+    //console.log(solution.aT)
+    // if( typeof solution.aT != "undefined"){
+    if (solution.aT.isSame(i.start)) {
+      score = score + 1;
+      // }
+    }
+  }
+  for (var i of j2.data) {
+    //  console.log(solution.bT)
+    // if( typeof solution.aT != "undefined"){
+    if (solution.bT.isSame(i.start)) {
+      score = score + 1;
+      // }
+    }
+  }
+  for (var i of j3.data) {
+    //console.log(solution.aT)
+    // if( typeof solution.aT != "undefined"){
+    if (solution.cT.isSame(i.start)) {
       score = score + 1;
       // }
     }
   }
 
-  if (j1.includes(solution.aT) == true) {
-    score = score + 1;
-  }
-  if (j2.includes(solution.bT) == true) {
-    score = score + 1;
-  }
-  if (j3.includes(solution.cT) == true) {
-    score = score + 1;
-  }
+  // if (j1.includes(solution.aT) == true) {
+  //   score = score + 1;
+  // }
+  // if (j2.includes(solution.bT) == true) {
+  //   score = score + 1;
+  // }
+  // if (j3.includes(solution.cT) == true) {
+  //   score = score + 1;
+  // }
   // if(j4.includes(solution.dT) == true){
   //   score = score+1;
   // }
@@ -228,8 +282,8 @@ function fitness(solution, callback) {
   // var mechAssn = [solution.a,solution.b,solution.c,solution.d,solution.e,solution.f,solution.g]
   // var timeAssn = [solution.aT,solution.bT,solution.cT,solution.dT,solution.eT,solution.fT,solution.gT]
 
-  var mechAssn = [solution.a];
-  var timeAssn = [solution.aT];
+  var mechAssn = [solution.a,solution.b,solution.c];
+  var timeAssn = [solution.aT,solution.bT,solution.cT];
 
   //Repetition, one worker should not be assigned 2 jobs at the same day and time.
   for (j = 0; j < mechAssn.length; j++) {
@@ -242,17 +296,20 @@ function fitness(solution, callback) {
   }
 
   //Overlap, If one worker works from 10-12 on a job, he should not be assigned a differnt job at 11.
-  for (j = 0; j < mechAssn.length; j++) {
-    for (k = 0; k < mechAssn.length; k++) {
-      if (k != j && mechAssn[k] == mechAssn[j]) {
-        if (timeAssn[k].isBefore(timeAssn[j]) && (timeAssn[k].add(duration[k], 'hours').isBefore(timeAssn[j]))) {
-          score = score - 1;
-        }
 
-      }
 
-    }
-  }
+  //
+  // for (j = 0; j < mechAssn.length; j++) {
+  //   for (k = 0; k < mechAssn.length; k++) {
+  //     if (k != j && mechAssn[k] == mechAssn[j]) {
+  //       if (timeAssn[k].isBefore(timeAssn[j]) && (timeAssn[k].add(duration[k], 'hours').isBefore(timeAssn[j]))) {
+  //         score = score - 1;
+  //       }
+  //
+  //     }
+  //
+  //   }
+  // }
 
   // if(workerTimes[solution.a] === duration[0] && (workers[solution.a][0] === j1[0]) ){
   //     score=score+1;
@@ -277,60 +334,39 @@ function fitness(solution, callback) {
   // }
 
   //Both Worker and machine should be available for the entire duration of job
-  var cj1 =moment(j1[(j1.length - 1)])
-  cj1.add(1,'hours')
-  var tj1=moment(solution.aT)
-  tj1.add(duration[0],'hours');
-  if (workerTimes[solution.a] >= duration[0]){
-    if(tj1.isBefore(cj1)){
-      score = score + 1;
-    }
-     else if(tj1.isBefore(cj1))
-    {
-      score = score + 1;
-    }
-    console.log(cj1 + "//"+tj1 )
+
+//
+//       if(workerTimes[solution.a] >= duration[0] && ( solution.aT + duration[0]  <= 1 + j1[(j1.length-1)])){
+//           score=score+1;
+//       }
+//
+// if()
+//
+//
+//
+//   var cj1 = moment(j1[(j1.length - 1)])
+//   cj1.add(1, 'hours')
+//   var tj1 = moment(solution.aT)
+//   tj1.add(duration[0], 'hours');
+//   if (workerTimes[solution.a] >= duration[0]) {
+//     if (tj1.isBefore(cj1)) {
+//       score = score + 1;
+//     } else if (tj1.isBefore(cj1)) {
+//       score = score + 1;
+//     }
+//     console.log(cj1 + "//" + tj1)
+//   }
+
+
+  if (solution.aT.isSame(moment("1010-10-20 11:00"))) {
+    score = score - 3;
   }
-
-  var cj2 =moment(j2[(j2.length - 1)])
-  cj2.add(1,'hours')
-  var tj2=moment(solution.bT)
-  tj2.add(duration[1],'hours');
-  if (workerTimes[solution.b] >= duration[1]){
-    if(tj2.isBefore(cj2)){
-      score = score + 1;
-    }
-     else if(tj2.isBefore(cj2))
-    {
-      score = score + 1;
-    }
-  //  console.log(cj1 + "//"+tj1 )
+  if (solution.bT.isSame(moment("1010-10-20 11:00"))) {
+    score = score - 3;
   }
-
-    var cj3 =moment(j2[(j2.length - 1)])
-    cj3.add(1,'hours')
-    var tj3=moment(solution.bT)
-    tj3.add(duration[2],'hours');
-    if (workerTimes[solution.c] >= duration[2]){
-      if(tj3.isBefore(cj3)){
-        score = score + 1;
-      }
-       else if(tj3.isBefore(cj3))
-      {
-        score = score + 1;
-      }
-      // console.log(cj1 + "//"+tj1 )
-    }
-
-    if(solution.aT.isSame("1010-10-20 11:00")){
-      score = score-1;
-    }
-    if(solution.bT.isSame("1010-10-20 11:00")){
-      score = score-1;
-    }
-    if(solution.cT.isSame("1010-10-20 11:00")){
-      score = score-1;
-      }
+  if (solution.cT.isSame(moment("1010-10-20 11:00"))) {
+    score = score - 3;
+  }
   // if (workerTimes[solution.b] >= duration[1]){
   //   if(solution.bT.add(duration[1], "h").isBefore(j2[(j2.length - 1)].add(1, "h") ))
   //   {
@@ -381,29 +417,32 @@ function fitness(solution, callback) {
 
 function crossover(parent1, parent2, callback) {
   var child = {}
-  if (Math.random() > 0.5) {
+  if (Math.random()>0.5) {
     child.a = parent1.a
-    child.aT = moment(parent1.aT)
-  } else {
+    child.aT = parent1.aT
+  }
+  else {
     child.a = parent2.a
-    child.aT = moment(parent2.aT)
+    child.aT = parent2.aT
   }
-  if (Math.random() > 0.5) {
+  if (Math.random()>0.5) {
     child.b = parent1.b
-    child.bT = moment(parent1.bT)
-
-  } else {
-    child.b = parent2.b
-    child.bT = moment(parent2.bT)
+    child.bT = parent1.bT
 
   }
-  if (Math.random() > 0.5) {
-    child.c = parent1.c
-    child.cT = moment(parent1.cT)
+  else {
+    child.b = parent2.b
+    child.bT = parent2.bT
 
-  } else {
+  }
+  if (Math.random()>0.5) {
+    child.c = parent1.c
+    child.cT = parent1.cT
+
+  }
+  else {
     child.c = parent2.c
-    child.cT = moment(parent1.cT)
+    child.cT = parent2.cT
   }
   // if (Math.random()>0.5) {
   //   child.d = parent1.d
@@ -446,13 +485,13 @@ function crossover(parent1, parent2, callback) {
 
 function mutate(solution, callback) {
   if (Math.random() < 0.3) {
-    solution.a = Math.floor(Math.random() * (1 - 0 + 1) + 0)
+    solution.a = getRandomInt(0,workers.length-1)
   }
   if (Math.random() < 0.3) {
-    solution.b = Math.floor(Math.random() * (1 - 0 + 1) + 0)
+    solution.b = getRandomInt(0,workers.length-1)
   }
   if (Math.random() < 0.3) {
-    solution.c = Math.floor(Math.random() * (1 - 0 + 1) + 0)
+    solution.c = getRandomInt(0,workers.length-1)
   }
   // if (Math.random()<0.3) {
   //   solution.d = Math.floor(Math.random() * (1 - 0 + 1) + 0)
@@ -500,15 +539,8 @@ function stopCriteria() {
 }
 
 console.log('=== TEST BEGINS === ')
-var t = new Task(options)
-t.on('run start', function() {
-  console.log('run start');
-  util.log('run')
-})
-t.on('run finished', function(results) {
-  console.log('run finished - ', results);
-  util.log('run')
-})
+var t = new Task(options);
+
 // t.on('init start', function () { console.log('init start') })
 // t.on('init end', function (pop) { console.log('init end', pop) })
 // t.on('loop start', function () { console.log('loop start') })
@@ -526,7 +558,7 @@ t.on('run finished', function(results) {
 
 t.on('statistics', function(statistics) {
   console.log('statistics', statistics)
-})
+});
 //
 // t.on('normalize start', function () { console.log('normalize start') })
 // t.on('normalize end', function (normalized) { console.log('normalize end',normalized) })
@@ -541,9 +573,8 @@ t.on('statistics', function(statistics) {
 // t.on('reproduction end', function (children) { console.log('reproduction end',children) })
 t.on('error', function(error) {
   console.log('ERROR - ', error)
-})
+});
 t.run(function(stats) {
   console.log('results', stats);
 
-  console.log("Max", stats.max);
-})
+});

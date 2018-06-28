@@ -1,46 +1,77 @@
 //hello
 var genetic = require('genetic');
 var moment = require('moment');
-var Task = genetic.Task
-  , options = { getRandomSolution : getRandomSolution
-            , popSize : 500
-            , stopCriteria : stopCriteria
-            , fitness : fitness
-            , minimize : false
-            , mutateProbability : 0.05
-            , mutate : mutate
-            , crossoverProbability : 0.5
-            , crossover : crossover
-            }
-    , util = require('util')
+var Task = genetic.Task,
+  options = {
+    getRandomSolution: getRandomSolution,
+    popSize: 500,
+    stopCriteria: stopCriteria,
+    fitness: fitness,
+    minimize: false,
+    mutateProbability: 0.05,
+    mutate: mutate,
+    crossoverProbability: 0.5,
+    crossover: crossover
+  },
+  util = require('util')
 
 //var workers = [[10,11],[7,8,9,10,11],[7,8,9,10,11],[1,2]];
 
-  var workers = [[moment("2010-10-20 10:00","YYYY-MM-DD HH:mm"),
-                  moment("2010-10-20 11:00","YYYY-MM-DD HH:mm")],
-
-                [moment("2010-10-21 08:00","YYYY-MM-DD HH:mm"),
-                  moment("2010-10-21 09:00","YYYY-MM-DD HH:mm"),
-
-                  moment("2010-10-23 10:01","YYYY-MM-DD HH:mm"),
-                  moment("2010-10-23 11:01","YYYY-MM-DD HH:mm")]]
-
-                //,[7,8,9,10
-    //,11],[7,8,9,10,11],[1,2]];
+// Worker Availability hours Start Times (Every Hour)
 
 
+var workers = [
+  [
+    moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+    moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
+  ],
 
+  [
+    moment("2010-10-21 08:00", "YYYY-MM-DD HH:mm"),
+    moment("2010-10-21 09:00", "YYYY-MM-DD HH:mm"),
+    moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+    moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
+  ]
+]
+
+//,[7,8,9,10
+//,11],[7,8,9,10,11],[1,2]];
 
 // var j  = [[7],[7],[8,9],[8],[11],[10,11],[11]];
-var duration = [1,1,2,1,1,2,1];
-var predecessor = [0,1,0,0,2,1,1];
+//Duration of Task in Hours
 
-var j1 = [moment("2010-10-20 10:00","YYYY-MM-DD HH:mm"),
-                moment("2010-10-20 11:00","YYYY-MM-DD HH:mm")];
-var j2 = [moment("2010-10-21 8:00","YYYY-MM-DD HH:mm"),
-                moment("2010-10-21 9:00","YYYY-MM-DD HH:mm")];
-var j3 = [moment("2010-10-23 10:00","YYYY-MM-DD HH:mm"),
-                moment("2010-10-23 11:00","YYYY-MM-DD HH:mm")];
+var duration = [
+  1,
+  1,
+  2,
+  1,
+  1,
+  2,
+  1
+];
+var predecessor = [
+  0,
+  1,
+  0,
+  0,
+  2,
+  1,
+  1
+];
+
+//Machine Availability times Start Times (Every Hour)
+var j1 = [
+  moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+  moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
+];
+var j2 = [
+  moment("2010-10-21 8:00", "YYYY-MM-DD HH:mm"),
+  moment("2010-10-21 9:00", "YYYY-MM-DD HH:mm")
+];
+var j3 = [
+  moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+  moment("2010-10-20 11:00", "YYYY-MM-DD HH:mm")
+];
 
 // var j2 = [7];
 // var j3 = [8,9];
@@ -49,31 +80,31 @@ var j3 = [moment("2010-10-23 10:00","YYYY-MM-DD HH:mm"),
 // var j6 = [10,11];
 // var j7 = [11];
 
-var priority = [1.5, 0.5, 1, 0.5 ,1.5, 0.5, 0.5]
+//How many Hours are the workers available?
 var workerTimes = []
 
-
-for(var i =0;i<workers.length;i++){
+for (var i = 0; i < workers.length; i++) {
   workerTimes.push(workers[i].length);
 }
 
 // console.log(j.typeOf);
-
+//Gives a random value including of min range and ONLY LESSER THAN the max limit
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function getSimilarTimes(arr1, arr2){
+//Returns a random hour during which both the worker and machine are available
+function getSimilarTimes(arr1, arr2) {
   var returnArray = []
   var unrepArr = []
 
-for( var i =0; i<arr1.length; i++){
-  for( var a =0; a<arr2.length; a++){
-    if(arr1[i].isSame(arr2[a])){
-      returnArray.push(arr1[i])
+  for (var i = 0; i < arr1.length; i++) {
+    for (var a = 0; a < arr2.length; a++) {
+      if (arr1[i].isSame(arr2[a])) {
+        returnArray.push(arr1[i])
+      }
     }
   }
-}
   //
   // arr1.forEach((e1)=> {
   //   if(arr1.some(e1 => arr2.includes(e1)) == true){
@@ -83,50 +114,47 @@ for( var i =0; i<arr1.length; i++){
   // })
 
   console.log(returnArray)
-  if(returnArray.length==1){
+  if (returnArray.length == 1) {
     return returnArray[0];
-  }
-  else if(returnArray.length==0){
-  //  return null;
-    return(moment("1010-10-20 11:00","YYYY-MM-DD HH:mm"))
-  }
-  else{
-  return returnArray[getRandomInt(0,returnArray.length-1)]
+  } else if (returnArray.length == 0) {
+    //  returns an easily identifiable value with year 1000, to indicate infeasable solution
+    return (moment("1010-10-20 11:00", "YYYY-MM-DD HH:mm"))
+  } else {
+    return returnArray[getRandomInt(0, returnArray.length - 1)]
   }
 }
 
-
 function getRandomSolution(callback) {
   var solution = {
-     a: Math.floor(Math.random() * (1 - 0 + 1) + 0),
-     aT: [],
-     b: Math.floor(Math.random() * (1 - 0 + 1) + 0),
-     bT: [],
-      c: Math.floor(Math.random() * (1 - 0 + 1) + 0),
-     cT:[],
-     // d: Math.floor(Math.random() * (3 - 0 + 1) + 0),
-     // dT:[],
-     // e: Math.floor(Math.random() * (3 - 0 + 1) + 0),
-     // eT:[],
-     // f: Math.floor(Math.random() * (3 - 0 + 1) + 0),
-     // fT: [],
-     // g: Math.floor(Math.random() * (3 - 0 + 1) + 0),
-     // gT: []
+    a: getRandomInt(0, (workers.length - 1)),
+    aT: [],
+    b: getRandomInt(0, (workers.length - 1)),
+    bT: [],
+    c: getRandomInt(0, (workers.length - 1)),
+    cT: [],
+    // d: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+    // dT:[],
+    // e: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+    // eT:[],
+    // f: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+    // fT: [],
+    // g: Math.floor(Math.random() * (3 - 0 + 1) + 0),
+    // gT: []
 
-   }
+  }
 
-   solution.aT = getSimilarTimes(workers[solution.a], j1)
-   solution.bT = getSimilarTimes(workers[solution.b], j2)
-   solution.cT = getSimilarTimes(workers[solution.c], j3)
-   // solution.dT = getSimilarTimes(workers[solution.d], j4)
-   // solution.eT = getSimilarTimes(workers[solution.e], j5)
-   // solution.fT = getSimilarTimes(workers[solution.f], j6)
-   // solution.gT = getSimilarTimes(workers[solution.g], j7)
+  solution.aT = getSimilarTimes(workers[solution.a], j1)
+  solution.bT = getSimilarTimes(workers[solution.b], j2)
+  solution.cT = getSimilarTimes(workers[solution.c], j3)
+  // solution.dT = getSimilarTimes(workers[solution.d], j4)
+  // solution.eT = getSimilarTimes(workers[solution.e], j5)
+  // solution.fT = getSimilarTimes(workers[solution.f], j6)
+  // solution.gT = getSimilarTimes(workers[solution.g], j7)
 
   callback(solution)
 }
 function fitness(solution, callback) {
-//  console.log(solution);
+  //  console.log(solution);
   var score = 0;
   // if(workers[solution.a].some(ele => j1.includes(ele)) == true){
   //   score = score+1;
@@ -149,40 +177,39 @@ function fitness(solution, callback) {
   // if(workers[solution.g].some(ele => j7.includes(ele)) == true){
   //   score = score+1;
   // }
-  for(var i of workers[solution.a] ){
+  for (var i of workers[solution.a]) {
     //console.log(solution.aT)
-   // if( typeof solution.aT != "undefined"){
-     if(solution.aT.isSame(i) ){
-     score =score+1;
-  // }
+    // if( typeof solution.aT != "undefined"){
+    if (solution.aT.isSame(i)) {
+      score = score + 1;
+      // }
     }
   }
-  for(var i of workers[solution.b] ){
-  //  console.log(solution.bT)
-   // if( typeof solution.aT != "undefined"){
-     if(solution.bT.isSame(i) ){
-     score =score+1;
-  // }
+  for (var i of workers[solution.b]) {
+    //  console.log(solution.bT)
+    // if( typeof solution.aT != "undefined"){
+    if (solution.bT.isSame(i)) {
+      score = score + 1;
+      // }
     }
   }
-  for(var i of workers[solution.c] ){
+  for (var i of workers[solution.c]) {
     //console.log(solution.aT)
-   // if( typeof solution.aT != "undefined"){
-     if(solution.cT.isSame(i) ){
-     score =score+1;
-  // }
+    // if( typeof solution.aT != "undefined"){
+    if (solution.cT.isSame(i)) {
+      score = score + 1;
+      // }
     }
   }
 
-
-  if(j1.includes(solution.aT) == true){
-    score = score+1;
+  if (j1.includes(solution.aT) == true) {
+    score = score + 1;
   }
-  if(j2.includes(solution.bT) == true){
-    score = score+1;
+  if (j2.includes(solution.bT) == true) {
+    score = score + 1;
   }
-  if(j3.includes(solution.cT) == true){
-    score = score+1;
+  if (j3.includes(solution.cT) == true) {
+    score = score + 1;
   }
   // if(j4.includes(solution.dT) == true){
   //   score = score+1;
@@ -197,115 +224,186 @@ function fitness(solution, callback) {
   //     score = score+1;
   //   }
 
-    var simInd = []
-    // var mechAssn = [solution.a,solution.b,solution.c,solution.d,solution.e,solution.f,solution.g]
-    // var timeAssn = [solution.aT,solution.bT,solution.cT,solution.dT,solution.eT,solution.fT,solution.gT]
+  var simInd = []
+  // var mechAssn = [solution.a,solution.b,solution.c,solution.d,solution.e,solution.f,solution.g]
+  // var timeAssn = [solution.aT,solution.bT,solution.cT,solution.dT,solution.eT,solution.fT,solution.gT]
 
   var mechAssn = [solution.a];
   var timeAssn = [solution.aT];
 
-    for (j=0;j<mechAssn.length;j++){
-      for (k=0;k<mechAssn.length;k++){
-        if (k!=j && mechAssn[k] == mechAssn[j] && timeAssn[k] === timeAssn[j]){
-            score = score - 1;
-          }
-
+  //Repetition, one worker should not be assigned 2 jobs at the same day and time.
+  for (j = 0; j < mechAssn.length; j++) {
+    for (k = 0; k < mechAssn.length; k++) {
+      if (k != j && mechAssn[k] == mechAssn[j] && (timeAssn[k].isSame(timeAssn[j]))) {
+        score = score - 1;
       }
+
     }
+  }
 
-    for (j=0;j<mechAssn.length;j++){
-      for (k=0;k<mechAssn.length;k++){
-        if (k!=j && mechAssn[k] == mechAssn[j]) {
-          if( timeAssn[k] < timeAssn[j] && ((timeAssn[k] + duration[k]) > timeAssn[j] ) ){
-            score = score - 1;
-          }
-
+  //Overlap, If one worker works from 10-12 on a job, he should not be assigned a differnt job at 11.
+  for (j = 0; j < mechAssn.length; j++) {
+    for (k = 0; k < mechAssn.length; k++) {
+      if (k != j && mechAssn[k] == mechAssn[j]) {
+        if (timeAssn[k].isBefore(timeAssn[j]) && (timeAssn[k].add(duration[k], 'hours').isBefore(timeAssn[j]))) {
+          score = score - 1;
         }
 
       }
+
+    }
+  }
+
+  // if(workerTimes[solution.a] === duration[0] && (workers[solution.a][0] === j1[0]) ){
+  //     score=score+1;
+  // }
+  // if(workerTimes[solution.b] === duration[1] && (workers[solution.b][0] === j2[0])){
+  //     score=score+1;
+  // }
+  // if(workerTimes[solution.c] === duration[2] && (workers[solution.c][0] === j3[0])){
+  //     score=score+1;
+  // }
+  // if(workerTimes[solution.d] === duration[3] && (workers[solution.d][0] === j4[0])){
+  //     score=score+1;
+  // }
+  // if(workerTimes[solution.e] === duration[4] && (workers[solution.e][0] === j5[0])){
+  //     score=score+1;
+  // }
+  // if(workerTimes[solution.f] === duration[5] && (workers[solution.f][0] === j6[0])){
+  //     score=score+1;
+  // }
+  // if(workerTimes[solution.g] === duration[6] && (workers[solution.g][0] === j7[0])){
+  //     score=score+1;
+  // }
+
+  //Both Worker and machine should be available for the entire duration of job
+  var cj1 =moment(j1[(j1.length - 1)])
+  cj1.add(1,'hours')
+  var tj1=moment(solution.aT)
+  tj1.add(duration[0],'hours');
+  if (workerTimes[solution.a] >= duration[0]){
+    if(tj1.isBefore(cj1)){
+      score = score + 1;
+    }
+     else if(tj1.isBefore(cj1))
+    {
+      score = score + 1;
+    }
+    console.log(cj1 + "//"+tj1 )
+  }
+
+  var cj2 =moment(j2[(j2.length - 1)])
+  cj2.add(1,'hours')
+  var tj2=moment(solution.bT)
+  tj2.add(duration[1],'hours');
+  if (workerTimes[solution.b] >= duration[1]){
+    if(tj2.isBefore(cj2)){
+      score = score + 1;
+    }
+     else if(tj2.isBefore(cj2))
+    {
+      score = score + 1;
+    }
+  //  console.log(cj1 + "//"+tj1 )
+  }
+
+    var cj3 =moment(j2[(j2.length - 1)])
+    cj3.add(1,'hours')
+    var tj3=moment(solution.bT)
+    tj3.add(duration[2],'hours');
+    if (workerTimes[solution.c] >= duration[2]){
+      if(tj3.isBefore(cj3)){
+        score = score + 1;
+      }
+       else if(tj3.isBefore(cj3))
+      {
+        score = score + 1;
+      }
+      // console.log(cj1 + "//"+tj1 )
     }
 
-    // if(workerTimes[solution.a] === duration[0] && (workers[solution.a][0] === j1[0]) ){
-    //     score=score+1;
-    // }
-    // if(workerTimes[solution.b] === duration[1] && (workers[solution.b][0] === j2[0])){
-    //     score=score+1;
-    // }
-    // if(workerTimes[solution.c] === duration[2] && (workers[solution.c][0] === j3[0])){
-    //     score=score+1;
-    // }
-    // if(workerTimes[solution.d] === duration[3] && (workers[solution.d][0] === j4[0])){
-    //     score=score+1;
-    // }
-    // if(workerTimes[solution.e] === duration[4] && (workers[solution.e][0] === j5[0])){
-    //     score=score+1;
-    // }
-    // if(workerTimes[solution.f] === duration[5] && (workers[solution.f][0] === j6[0])){
-    //     score=score+1;
-    // }
-    // if(workerTimes[solution.g] === duration[6] && (workers[solution.g][0] === j7[0])){
-    //     score=score+1;
-    // }
-
-    // if(workerTimes[solution.a] >= duration[0] && ( solution.aT + duration[0]  <= 1 + j1[(j1.length-1)])){
-    //     score=score+1;
-    // }
-
-    // if(workerTimes[solution.b] >= duration[1] && ( solution.bT + duration[1]  <= 1 + j2[(j2.length-1)])){
-    //     score=score+1;
-    // }
-    //
-    // if(workerTimes[solution.c] >= duration[2] && ( solution.cT + duration[2]  <= 1 + j3[(j3.length-1)])){
-    //     score=score+1;
-    // }
-    //
-    // if(workerTimes[solution.d] >= duration[3] && ( solution.dT + duration[3]  <= 1 + j4[(j4.length-1)])){
-    //     score=score+1;
-    // }
-    //
-    // if(workerTimes[solution.e] >= duration[4] && ( solution.eT + duration[4]  <= 1 + j5[(j5.length-1)])){
-    //         score=score+1;
-    //     }
-    //
-    // if(workerTimes[solution.f] >= duration[5]  && ( solution.fT + duration[5] <= 1 + j6[(j6.length-1)])){
-    //         score=score+1;
-    //     }
-    //
-    // if(workerTimes[solution.g] >= duration[6] && ( solution.gT + duration[6]  <= 1 + j7[(j7.length-1)])){
-    //     score=score+1
-    // }
+    if(solution.aT.isSame("1010-10-20 11:00")){
+      score = score-1;
+    }
+    if(solution.bT.isSame("1010-10-20 11:00")){
+      score = score-1;
+    }
+    if(solution.cT.isSame("1010-10-20 11:00")){
+      score = score-1;
+      }
+  // if (workerTimes[solution.b] >= duration[1]){
+  //   if(solution.bT.add(duration[1], "h").isBefore(j2[(j2.length - 1)].add(1, "h") ))
+  //   {
+  //     score = score + 1;
+  //   }
+  //   else if(solution.bT.add(duration[1], "h").isSame(j2[(j2.length - 1)].add(1, "h") ))
+  //   {
+  //     score = score + 1;
+  //   }
+  // }
+  //
+  // if (workerTimes[solution.c] >= duration[2]){
+  //   if(solution.cT.add(duration[2], "h").isBefore(j3[(j3.length - 1)].add(1, "h") )){
+  //
+  //     score = score + 1;
+  //   }
+  //   else if(solution.cT.add(duration[2], "h").isSame(j3[(j3.length - 1)].add(1, "hours")))
+  //   {
+  //     score = score + 1;
+  //   }
+  // }
+  // if(workerTimes[solution.b] >= duration[1] && ( solution.bT + duration[1]  <= 1 + j2[(j2.length-1)])){
+  //     score=score+1;
+  // }
+  //
+  // if(workerTimes[solution.c] >= duration[2] && ( solution.cT + duration[2]  <= 1 + j3[(j3.length-1)])){
+  //     score=score+1;
+  // }
+  //
+  // if(workerTimes[solution.d] >= duration[3] && ( solution.dT + duration[3]  <= 1 + j4[(j4.length-1)])){
+  //     score=score+1;
+  // }
+  //
+  // if(workerTimes[solution.e] >= duration[4] && ( solution.eT + duration[4]  <= 1 + j5[(j5.length-1)])){
+  //         score=score+1;
+  //     }
+  //
+  // if(workerTimes[solution.f] >= duration[5]  && ( solution.fT + duration[5] <= 1 + j6[(j6.length-1)])){
+  //         score=score+1;
+  //     }
+  //
+  // if(workerTimes[solution.g] >= duration[6] && ( solution.gT + duration[6]  <= 1 + j7[(j7.length-1)])){
+  //     score=score+1
+  // }
 
   callback(score)
 }
 
 function crossover(parent1, parent2, callback) {
   var child = {}
-  if (Math.random()>0.5) {
+  if (Math.random() > 0.5) {
     child.a = parent1.a
-    child.aT = parent1.aT
-  }
-  else {
+    child.aT = moment(parent1.aT)
+  } else {
     child.a = parent2.a
-    child.aT = parent2.aT
+    child.aT = moment(parent2.aT)
   }
-  if (Math.random()>0.5) {
+  if (Math.random() > 0.5) {
     child.b = parent1.b
-    child.bT = parent1.bT
+    child.bT = moment(parent1.bT)
 
-  }
-  else {
+  } else {
     child.b = parent2.b
-    child.bT = parent2.bT
+    child.bT = moment(parent2.bT)
 
   }
-  if (Math.random()>0.5) {
+  if (Math.random() > 0.5) {
     child.c = parent1.c
-    child.cT = parent1.cT
+    child.cT = moment(parent1.cT)
 
-  }
-  else {
+  } else {
     child.c = parent2.c
-    child.cT = parent2.cT
+    child.cT = moment(parent1.cT)
   }
   // if (Math.random()>0.5) {
   //   child.d = parent1.d
@@ -347,13 +445,13 @@ function crossover(parent1, parent2, callback) {
 }
 
 function mutate(solution, callback) {
-  if (Math.random()<0.3) {
+  if (Math.random() < 0.3) {
     solution.a = Math.floor(Math.random() * (1 - 0 + 1) + 0)
   }
-  if (Math.random()<0.3) {
+  if (Math.random() < 0.3) {
     solution.b = Math.floor(Math.random() * (1 - 0 + 1) + 0)
   }
-  if (Math.random()<0.3) {
+  if (Math.random() < 0.3) {
     solution.c = Math.floor(Math.random() * (1 - 0 + 1) + 0)
   }
   // if (Math.random()<0.3) {
@@ -370,36 +468,32 @@ function mutate(solution, callback) {
   //   solution.g = Math.floor(Math.random() * (3 - 0 + 1) + 0)
   // }
 
+  if (Math.random() < 0.3) {
+    solution.aT = getSimilarTimes(workers[solution.a], j1)
+  }
+  if (Math.random() < 0.3) {
+    solution.bT = getSimilarTimes(workers[solution.b], j2)
+  }
+  if (Math.random() < 0.3) {
+    solution.cT = getSimilarTimes(workers[solution.c], j3)
 
-    if (Math.random()<0.3) {
-      solution.aT = getSimilarTimes(workers[solution.a], j1)
-    }
-    if (Math.random()<0.3) {
-      solution.bT = getSimilarTimes(workers[solution.b], j2)
-    }
-    if (Math.random()<0.3) {
-      solution.cT = getSimilarTimes(workers[solution.c], j3)
-
-    }
-    // if (Math.random()<0.3) {
-    //   solution.dT = getSimilarTimes(workers[solution.d], j4)
-    //     }
-    // if (Math.random()<0.3) {
-    //   solution.eT = getSimilarTimes(workers[solution.e], j5)
-    // }
-    // if (Math.random()<0.3) {
-    //   solution.fT = getSimilarTimes(workers[solution.f], j6)
-    //   }
-    //
-    // if (Math.random()<0.3) {
-    //   solution.gT = getSimilarTimes(workers[solution.g], j7)
-    // }
-
-
+  }
+  // if (Math.random()<0.3) {
+  //   solution.dT = getSimilarTimes(workers[solution.d], j4)
+  //     }
+  // if (Math.random()<0.3) {
+  //   solution.eT = getSimilarTimes(workers[solution.e], j5)
+  // }
+  // if (Math.random()<0.3) {
+  //   solution.fT = getSimilarTimes(workers[solution.f], j6)
+  //   }
+  //
+  // if (Math.random()<0.3) {
+  //   solution.gT = getSimilarTimes(workers[solution.g], j7)
+  // }
 
   callback(solution)
 }
-
 
 function stopCriteria() {
   return (this.generation == 10);
@@ -407,8 +501,14 @@ function stopCriteria() {
 
 console.log('=== TEST BEGINS === ')
 var t = new Task(options)
-  t.on('run start', function () { console.log('run start'); util.log('run') })
-  t.on('run finished', function (results) { console.log('run finished - ', results); util.log('run')})
+t.on('run start', function() {
+  console.log('run start');
+  util.log('run')
+})
+t.on('run finished', function(results) {
+  console.log('run finished - ', results);
+  util.log('run')
+})
 // t.on('init start', function () { console.log('init start') })
 // t.on('init end', function (pop) { console.log('init end', pop) })
 // t.on('loop start', function () { console.log('loop start') })
@@ -422,10 +522,12 @@ var t = new Task(options)
 // t.on('reproduction start', function () { console.log('reproduction start') })
 //
 //  t.on('find sum', function () { console.log('find sum') })
- //t.on('find sum end', function (sum) { console.log('find sum end', sum) })
+//t.on('find sum end', function (sum) { console.log('find sum end', sum) })
 
-t.on('statistics', function (statistics) { console.log('statistics',statistics)})
-// //
+t.on('statistics', function(statistics) {
+  console.log('statistics', statistics)
+})
+//
 // t.on('normalize start', function () { console.log('normalize start') })
 // t.on('normalize end', function (normalized) { console.log('normalize end',normalized) })
 // t.on('child forming start', function () { console.log('child forming start') })
@@ -437,8 +539,11 @@ t.on('statistics', function (statistics) { console.log('statistics',statistics)}
 //
 //
 // t.on('reproduction end', function (children) { console.log('reproduction end',children) })
-t.on('error', function (error) { console.log('ERROR - ', error) })
-t.run(function (stats) { console.log('results', stats);
+t.on('error', function(error) {
+  console.log('ERROR - ', error)
+})
+t.run(function(stats) {
+  console.log('results', stats);
 
-console.log("Max", stats.max);
- })
+  console.log("Max", stats.max);
+})

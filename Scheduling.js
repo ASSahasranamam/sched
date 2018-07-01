@@ -1,9 +1,7 @@
-var Genetic = require('genetic-js')
-var genetic = Genetic.create();
+
 var moment = require('moment');
 
-//genetic.select1 = Genetic.Select1.Tournament2;
-//genetic.select2 = Genetic.Select2.Tournament2;
+
 var config = {
     "iterations": 1000
     , "size": 100

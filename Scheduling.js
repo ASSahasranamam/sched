@@ -1,20 +1,17 @@
-//hello
-var genetic = require('genetic');
+var Genetic = require('genetic-js')
+var genetic = Genetic.create();
 var moment = require('moment');
-var Task = genetic.Task,
-  options = {
-    getRandomSolution: getRandomSolution,
-    popSize: 500,
-    stopCriteria: stopCriteria,
-    fitness: fitness,
-    minimize: false,
-    mutateProbability: 0.01,
-    mutate: mutate,
-    crossoverProbability: 0.5,
-    crossover: crossover
-  },
-  util = require('util')
 
+//genetic.select1 = Genetic.Select1.Tournament2;
+//genetic.select2 = Genetic.Select2.Tournament2;
+var config = {
+    "iterations": 1000
+    , "size": 100
+    , "crossover": 0.5
+    , "mutation": 0.05
+  };
+  var fittest = []
+var maxPpg =[]
 var workers = [
   { //worker0
     id: 10,
@@ -87,6 +84,7 @@ var workers = [
         ]
       }
 ]
+
 
 //Duration of Task in Hours
 //var duration = [1, 1, 2];
@@ -187,46 +185,19 @@ var j = [
   }
 ]
 
-
+function getMax(arr, prop) {
+    var max;
+    for (var i=0 ; i<arr.length ; i++) {
+        if (!max || parseInt(arr[i][prop]) > parseInt(max[prop]))
+            max = arr[i];
+    }
+    return max;
+}
 
 //Gives a random value including of min range and ONLY LESSER THAN the max limit
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-
-
-//Returns a random hour during which both the worker and machine are available
-// function getSimilarTimes(arr1, arr2) {
-//   //  console.log("sss");
-//   var returnArray = []
-//
-//   for (var i = 0; i < arr1.length; i++) {
-//     //  console.log("getSimilarTimes");
-//     //  console.log("arr2", arr2)
-//     //  console.log(arr1)
-//     //  console.log(arr2)
-//     if (moment(arr1[i].start).isSameOrBefore(moment(arr2.data.start)) && ((arr1[i].end).isSameOrAfter(moment(arr2.data.start).add(arr2.duration, "h")))) {
-//
-//       if ((arr1[i].start).isSameOrAfter((arr2.data.start))) {
-//         returnArray.push(arr1[i].start)
-//       } else {
-//         returnArray.push(arr2.data.start)
-//       }
-//     }
-//   //  console.log(returnArray)
-//   }
-//
-//   //console.log(returnArray)
-//   if (returnArray.length == 1) {
-//     return returnArray[0];
-//   } else if (returnArray.length == 0) {
-//     //  returns an easily identifiable value with year 1000, to indicate infeasable solution
-//     return (moment("1010-10-20 11:00", "YYYY-MM-DD HH:mm"))
-//   } else {
-//     return returnArray[getRandomInt(0, returnArray.length - 1)]
-//   }
-// }
-
 function getSimilarTimes(wArr,jArr){
   var returnArray = []
 //There is no implementation for deadline of Job as of yet.
@@ -254,138 +225,192 @@ function getSimilarTimes(wArr,jArr){
 }
 
 
-function getRandomSolution(callback) {
+
+var population=[];
+
+
+
+function seed() {
   var solution = [];
   for (i of j) {
     solution.push({
       jobid: i.jid,
-      wid: getRandomInt(0, (workers.length - 1)),
+      wid: getRandomInt(0, (workers.length)),
       wpos: [],
       starttime: moment()
+
     })
   }
 
   for (var i = 0; i < solution.length; i++) {
     var returnShiftStart = [];
-    var ss = workers[solution[i].wid]
-    for (y of ss.shifts) {
+    var w = solution[i].wid
+     var ss = workers[w]
+
+     for(k of workers){
+    for(y of k.shifts) {
       returnShiftStart.push({start: y.start, end: y.end});
-    }
+    }}
+    console.log(i,returnShiftStart);
 
     solution[i].starttime = getSimilarTimes(returnShiftStart, j[i])
   }
 
-  //console.log(solution)
-  callback(solution)
+//  console.log(solution)
+ return solution;
+
 }
 
-function fitness(solution, callback) {
-  var score = 100;
+function createPop() {
 
-  for (i of solution) {
-    if (moment(i.starttime).isSame(moment("1010-10-20 11:00"))) {
-      score = score - 3;
+ for(var i=0;i<config.size;i++){
+   population.push(seed())
+   population[i].score=fitness(population[i])
+ }
+
+}
+
+function fitness(target) {
+  var score = 10;
+
+  for(var i=0;i<target.length;i++){
+    if(target[i].starttime.isSame(moment(j[i].data.start)) ){
+      score= score+1;
+    }else{
+  for(l of workers){
+        for(  k of l.shifts){
+        if(target[i].starttime.isSameOrAfter(moment(k.start)) ){
+          if(moment(target[i].starttime).add(j[i].duration,'h').isSameOrBefore(moment(k.end)) ){
+          score= score+1;
+        }
+      }}
+    }
+  }
+}
+  for (i of target) {
+    if (i.starttime.isAfter(moment("1010-10-20 11:00"))) {
+      score = score +1;
     }
   }
 
   //Repetition, one worker should not be assigned 2 jobs at the same day and time.
-  for (l = 0; l < solution.length; l++) {
-    for (k = 0; k < solution.length; k++) {
-      if (k != l && solution[k].wid == solution[l].wid && moment(solution[l].starttime).isSame(moment(solution[k].starttime))) {
-        score = score - 1;
+  for (l = 0; l < target.length; l++) {
+    for (k = 0; k < target.length; k++) {
+      if (k != l && target[k].wid == target[l].wid && moment(target[l].starttime).isSame(moment(target[k].starttime))) {
+        score=score;
+      } else{
+        score =score+1;
       }
 
     }
   }
 
-
-
-  //Overlap, If one worker works from 10-12 on a job, he should not be assigned a differnt job at 11.
-
-  //
-  // for (i = 0; i < solution.length; i++) {
-  //   for (k = 0; k < solution.length; k++) {
-  //     if (k != i && solution[k].wid == solution[i].wid) {
-  //       if (solution[k].starttime.isBefore(solution[i].starttime) && ( moment(solution[k].starttime).add(j[k].duration, 'hours').isBefore(moment(solution[i].starttime)))) {
-  //         score = score - 1;
-  //       }
-  //
-  //     }
-  //
-  //   }
-  // }
-
-
-
-  callback(score)
+  return score
 }
 
-function crossover(parent1, parent2, callback) {
+
+//
+function reproduce(){
+
+    var matingPool = []; // ArrayList which we will use for our "mating pool"
+
+    for (var i = 0; i < population.length; i++) {
+      var nnnn = Math.floor(population[i].score );
+      // Arbitrary multiplier, we can also use monte carlo method
+      for (var j = 0; j < nnnn; j++) {
+         // and pick two random numbers
+        matingPool.push(population[i]);
+      }
+    }
+
+      for (var i = 0; i < population.length; i++) {
+        var a = Math.floor(Math.random(matingPool.length));
+        var b = Math.floor(Math.random(matingPool.length));
+        var partnerA = matingPool[a];
+        var partnerB = matingPool[b];
+        var child = crossover(partnerA, partnerB);
+        mutate(child);
+        child.score = fitness(child);
+        population[i] = child;
+      }
+}
+//
+function crossover(parent1, parent2) {
   var child = parent1
   //  console.log(parent1)
   for (i = 0; i < parent1.length; i++) {
 
     if (Math.random() > 0.5) {
       //console.log(child)
-      child[i].jobid = parent1.jobid
+    //  child[i].jobid = parent1.jobid
       child[i].wid = parent1[i].wid
       child[i].starttime = parent1[i].starttime
     } else {
-      child[i].jobid = parent2[i].jobid
+      //child[i].jobid = parent2[i].jobid
       child[i].wid = parent2[i].wid
-      child[i].starttime = parent2[i].starttime
+       child[i].starttime = parent2[i].starttime
     }
 
   }
-
-  callback(child)
+  return child
 }
 
-//MUTATION
-
-function mutate(solution, callback) {
+function mutate(solution) {
 
   for (i of solution) {
-    if (Math.random() < 0.3) {
+    if (Math.random() < config.mutation) {
       i.wid = getRandomInt(0, workers.length - 1)
     }
   }
 
-  for (var i = 0; i < solution.length; i++) {
-    //console.log(solution.aT)
-    // if( typeof solution.aT != "undefined"){
-    var returnShiftStart = [];
-    var ss = workers[solution[i].wid]
-    for (y of ss.shifts) {
-      //      console.log("XXXXX", y)
-      returnShiftStart.push({start: y.start, end: y.end});
-      //            console.log(returnShiftStart);
-      // }
+
+    for (var i = 0; i < solution.length; i++) {
+      var returnShiftStart = [];
+      var w = solution[i].wid
+       var ss = workers[w]
+
+       for(k of workers){
+      for(y of k.shifts) {
+        returnShiftStart.push({start: y.start, end: y.end});
+      }}
+  //     console.log(i,returnShiftStart);
+
+      if (Math.random() < config.mutation) {
+        solution[i].starttime = getSimilarTimes(returnShiftStart, j[i])
+      }
     }
+//   for (var i = 0; i < solution.length; i++) {
+//     //console.log(solution.aT)
+//     // if( typeof solution.aT != "undefined"){
+//     var returnShiftStart = [];
+//     var ss = workers[solution[i].wid]
+//
+//     for (y of ss.shifts) {
+//       //      console.log("XXXXX", y)
+//       returnShiftStart.push({start: y.start, end: y.end});
+//       //            console.log(returnShiftStart);
+//       // }
+//     }
+// }
 
-    if (Math.random() < 0.3) {
-      solution[i].starttime = getSimilarTimes(returnShiftStart, j[i])
-    }
 
-  }
 
-  callback(solution)
+
+  return solution
 }
 
-function stopCriteria() {
-  return (this.generation === 1000);
+function start(){
+  createPop()
+  console.log(population)
+  var fittest=[]
+for(var i = 0; i<config.iterations;i++){
+  reproduce()
+  console.log(population)
+}
+population.sort(function(a,b){return a.score - b.score});
+population.reverse();
+
+console.log("xxx",population[0].score)
 }
 
-console.log('=== TEST BEGINS === ');
-var t = new Task(options);
-
-t.on('statistics', function(statistics) {
-  console.log('statistics', statistics)
-});
-
-t.on('error', function(error) {
-  console.log('ERROR - ', error)
-});
-t.run(function(stats) {
-  console.log('results', stats);
-});
+start();

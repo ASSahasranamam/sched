@@ -3,7 +3,7 @@ var moment = require('moment');
 
 
 var config = {
-    "iterations": 1000
+    "iterations": 10
     , "size": 100
     , "crossover": 0.5
     , "mutation": 0.05
@@ -63,8 +63,8 @@ var workers = [
         start: moment("2010-10-21 15:00 ", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-21 19:00", "YYYY-MM-DD HH:mm")
       }, { //worker3
-        start: moment("2010-10-21 09:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 17:00", "YYYY-MM-DD HH:mm")
+        start: moment("2010-10-22 09:00 ", "YYYY-MM-DD HH:mm"),
+        end: moment("2010-10-22 17:00", "YYYY-MM-DD HH:mm")
       }
     ]
   },
@@ -76,8 +76,8 @@ var workers = [
         start: moment("2010-10-20 17:00 ", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
       },  {
-            start: moment("2010-10-20 14:00 ", "YYYY-MM-DD HH:mm"),
-            end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
+            start: moment("2010-10-21 14:00 ", "YYYY-MM-DD HH:mm"),
+            end: moment("2010-10-21 16:00", "YYYY-MM-DD HH:mm")
           }
         ]
       }
@@ -200,9 +200,9 @@ function getSimilarTimes(wArr,jArr){
   var returnArray = []
 //There is no implementation for deadline of Job as of yet.
   for(var i=0;i<wArr.length;i++){
-    if(moment(jArr.data.start).isSame(moment(wArr[i].start)) ){
+    if((jArr.data.start).isSame((wArr[i].start)) ){
       returnArray.push(wArr[i].start);
-    }else if( moment(jArr.data.start).isAfter( moment(wArr[i].start)) ){
+    }else if( moment(jArr.data.start).isAfter( (wArr[i].start)) ){
       if(moment(jArr.data.start).add(jArr.duration,"h").isSameOrBefore(wArr[i].end)){
         returnArray.push(jArr.data.start)
       }

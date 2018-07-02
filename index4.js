@@ -16,11 +16,11 @@ var Task = genetic.Task,
   util = require('util')
 
 var workers = [
-  { //worker0
+  {
     id: 10,
     pos: 0,
     shifts: [
-      {
+      { //worker0
         start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
       }, {
@@ -28,88 +28,37 @@ var workers = [
         end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
       }
     ]
-  }, { //worker1
+  }, {
     id: 20,
     pos: 1,
     shifts: [
-      {
+      { //worker1
         start: moment("2010-10-20 13:00", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
       }, {
         start: moment("2010-10-21 08:00 ", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
-      }, {
-        start: moment("2010-10-22 08:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-22 12:00", "YYYY-MM-DD HH:mm")
       }
     ]
-  }, { //worker2
+  }, {
     id: 30,
     pos: 2,
     shifts: [
-      {
+      { //worker2
         start: moment("2010-10-20 08:00 ", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
-      },{
-        start: moment("2010-10-22 11:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-22 14:00", "YYYY-MM-DD HH:mm")
       }
     ]
-  },
-  { //worker3
-    id: 30,
-    pos: 3,
-    shifts: [
-      { //worker3
-        start: moment("2010-10-21 11:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 13:00", "YYYY-MM-DD HH:mm")
-      },
-      { //worker3
-        start: moment("2010-10-21 15:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 19:00", "YYYY-MM-DD HH:mm")
-      }, { //worker3
-        start: moment("2010-10-21 09:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 17:00", "YYYY-MM-DD HH:mm")
-      }
-    ]
-  },
-  {//worker4
-    id: 30,
-    pos: 4,
-    shifts: [
-      { //worker4
-        start: moment("2010-10-20 17:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
-      },  {
-            start: moment("2010-10-20 14:00 ", "YYYY-MM-DD HH:mm"),
-            end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
-          }
-        ]
-      }
+  }
 ]
-
-//Duration of Task in Hours
-//var duration = [1, 1, 2];
-
-var predecessor = [
-  0,
-  1,
-  0,
-  0,
-  2,
-  1,
-  1
-];
-
-//Machine Availability times Start Times (Every Hour)
 
 var j = [
   {
     jid: 1,
     duration: 2,
     data: {
-      start: moment("2010-10-20 09:10", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-20 11:10", "YYYY-MM-DD HH:mm")
+      start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
     }
 
   }, {
@@ -121,71 +70,15 @@ var j = [
     }
 
   }, {
-    jid: 3,
     duration: 2,
     data: {
       start: moment("2010-10-20 14:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
     }
 
-  },{
-    jid: 4,
-    duration: 3,
-    data: {
-      start: moment("2010-10-21 17:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 5,
-    duration: 2,
-    data: {
-      start: moment("2010-10-20 17:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-20 19:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 6,
-    duration: 2,
-    data: {
-      start: moment("2010-10-21 10:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-21 12:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 7,
-    duration: 1,
-    data: {
-      start: moment("2010-10-21 14:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-21 15:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 8,
-    duration: 1,
-    data: {
-      start: moment("2010-10-21 13:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-21 14:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 9,
-    duration: 1,
-    data: {
-      start: moment("2010-10-22 09:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-22 10:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 10,
-    duration: 2,
-    data: {
-      start: moment("2010-10-22 10:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-22 12:00", "YYYY-MM-DD HH:mm")
-    }
-  },{
-    jid: 11,
-    duration: 1,
-    data: {
-      start: moment("2010-10-22 16:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-22 17:00", "YYYY-MM-DD HH:mm")
-    }
   }
 ]
+//
 
 
 
@@ -194,38 +87,6 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-
-//Returns a random hour during which both the worker and machine are available
-// function getSimilarTimes(arr1, arr2) {
-//   //  console.log("sss");
-//   var returnArray = []
-//
-//   for (var i = 0; i < arr1.length; i++) {
-//     //  console.log("getSimilarTimes");
-//     //  console.log("arr2", arr2)
-//     //  console.log(arr1)
-//     //  console.log(arr2)
-//     if (moment(arr1[i].start).isSameOrBefore(moment(arr2.data.start)) && ((arr1[i].end).isSameOrAfter(moment(arr2.data.start).add(arr2.duration, "h")))) {
-//
-//       if ((arr1[i].start).isSameOrAfter((arr2.data.start))) {
-//         returnArray.push(arr1[i].start)
-//       } else {
-//         returnArray.push(arr2.data.start)
-//       }
-//     }
-//   //  console.log(returnArray)
-//   }
-//
-//   //console.log(returnArray)
-//   if (returnArray.length == 1) {
-//     return returnArray[0];
-//   } else if (returnArray.length == 0) {
-//     //  returns an easily identifiable value with year 1000, to indicate infeasable solution
-//     return (moment("1010-10-20 11:00", "YYYY-MM-DD HH:mm"))
-//   } else {
-//     return returnArray[getRandomInt(0, returnArray.length - 1)]
-//   }
-// }
 
 function getSimilarTimes(wArr,jArr){
   var returnArray = []

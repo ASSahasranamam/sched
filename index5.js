@@ -185,8 +185,8 @@ var j = [
     jid: 10,
     duration: 2,
     data: {
-      start: moment("2010-10-22 10:00", "YYYY-MM-DD HH:mm"),
-      end: moment("2010-10-22 12:00", "YYYY-MM-DD HH:mm")
+      start: moment("2010-10-22 9:00", "YYYY-MM-DD HH:mm"),
+      end: moment("2010-10-22 11:00", "YYYY-MM-DD HH:mm")
     }
   },{
     jid: 11,
@@ -255,12 +255,12 @@ function getSimilarTimes(wArr, jArr) {
   }
 
   if (returnArray.length === 1) {
-      return returnArray[0];
+      return moment(returnArray[0]);
     } else if (returnArray.length === 0) {
       //  returns an easily identifiable value with year 1000, to indicate infeasable solution
       return (moment("1010-10-20 11:00", "YYYY-MM-DD HH:mm"))
     } else {
-      return returnArray[getRandomInt(0, returnArray.length - 1)]
+      return moment(returnArray[getRandomInt(0, returnArray.length - 1)])
     }
 }
 
@@ -328,37 +328,42 @@ function fitness(solution, callback) {
   for (var i = 0; i < j.length; i++) {
     //console.log(solution.aT)
     // if( typeof solution.aT != "undefined"){
-    if ( moment(solution[i].starttime).isSameOrAfter((j[i].data.start)) &&
+    if ( moment(solution[i].starttime).isSameOrAfter((j[i].data.start)) &&// asubu should it be worker start time?
     (j[i].data.end).isSameOrAfter(moment(solution[i].starttime).add(j[i].duration,'h')) ) {
       score = score + 1;
       // }
     }
   }
+   //asubu uncommented
+  //Repetition, one worker should not be assigned 2 jobs at the same day and time.
+  for (var l = 0; l < solution.length; l++) {
+    for ( var k = 0; k < solution.length; k++) {
+      if (k!= l) {
+        if(solution[k].wid === solution[l].wid) {
+          if((solution[l].starttime).isSame((solution[k].starttime)))
+          {
+        //  score = score - 1; //DOES NOT WORK
+          }
+        }
+      }
 
-  // //Repetition, one worker should not be assigned 2 jobs at the same day and time.
-  // for (l = 0; l < solution.length; l++) {
-  //   for (k = 0; k < solution.length; k++) {
-  //     if (k != l && solution[k].wid === solution[l].wid && moment(solution[l].starttime).isSame((solution[k].starttime))) {
-  //   //    score = score - 1;
-  //     }
-  //
-  //   }
-  // }
+    }
+  }
 
   //Overlap, If one worker works from 10-12 on a job, he should not be assigned a differnt job at 11.
 
-  //
-  // for (j = 0; j < mechAssn.length; j++) {
-  //   for (k = 0; k < mechAssn.length; k++) {
-  //     if (k != j && mechAssn[k] == mechAssn[j]) {
-  //       if (timeAssn[k].isBefore(timeAssn[j]) && (timeAssn[k].add(duration[k], 'hours').isBefore(timeAssn[j]))) {
-  //         score = score - 1;
-  //       }
-  //
-  //     }
-  //
-  //   }
-  // }
+
+  for (var l = 0; l < solution.length-1; l++) {
+    for (k = l+1; k < solution.length; k++) {
+      if (k != l && solution[k].wid == solution[l].wid) {
+        if (solution[k].starttime.isSameOrBefore(solution[l].starttime) && (moment(solution[k].starttime).add(j[k].duration, 'hours').isSameOrAfter(solution[l].starttime))) {
+          score = score - 1;
+        }
+
+      }
+
+    }
+  }
 
 
 

@@ -3,7 +3,7 @@ var moment = require('moment');
 var Task = genetic.Task,
   options = {
     getRandomSolution: getRandomSolution,
-    popSize: 100,
+    popSize: 500,
     stopCriteria: stopCriteria,
     fitness: fitness,
     minimize: false,
@@ -14,85 +14,6 @@ var Task = genetic.Task,
   },
   util = require('util')
 
-// var workers = [
-//   {
-//     id: 10,
-//     pos: 0,
-//     shifts: [
-//       { //worker0
-//         start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-//         end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
-//       }, {
-//         start: moment("2010-10-20 02:00", "YYYY-MM-DD HH:mm"),
-//         end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
-//       }
-//     ]
-//   }, {
-//     id: 20,
-//     pos: 1,
-//     shifts: [
-//       { //worker1
-//         start: moment("2010-10-20 13:00", "YYYY-MM-DD HH:mm"),
-//         end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
-//       }, {
-//         start: moment("2010-10-21 08:00 ", "YYYY-MM-DD HH:mm"),
-//         end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
-//       }
-//     ]
-//   }, {
-//     id: 30,
-//     pos: 2,
-//     shifts: [
-//       { //worker2
-//         start: moment("2010-10-20 08:00 ", "YYYY-MM-DD HH:mm"),
-//         end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
-//       }
-//     ]
-//   }
-// ]
-//
-// //Duration of Task in Hours
-// var duration = [1, 1, 2];
-//
-// var predecessor = [
-//   0,
-//   1,
-//   0,
-//   0,
-//   2,
-//   1,
-//   1
-// ];
-//
-// //Machine Availability times Start Times (Every Hour)
-//
-// var j = [
-//   {
-//     jid: 1,
-//     duration: 2,
-//     data: {
-//       start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-//       end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
-//     }
-//
-//   }, {
-//     jid: 2,
-//     duration: 1,
-//     data: {
-//       start: moment("2010-10-21 08:00", "YYYY-MM-DD HH:mm"),
-//       end: moment("2010-10-21 09:00", "YYYY-MM-DD HH:mm")
-//     }
-//
-//   }, {
-//     duration: 2,
-//     data: {
-//       start: moment("2010-10-20 14:00", "YYYY-MM-DD HH:mm"),
-//       end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
-//     }
-//
-//   }
-// ]
-//
 
 var workers = [
   { //worker0
@@ -160,7 +81,8 @@ var workers = [
       { //worker4
         start: moment("2010-10-20 17:00 ", "YYYY-MM-DD HH:mm"),
         end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
-      },  {
+      },
+      {
             start: moment("2010-10-21 14:00 ", "YYYY-MM-DD HH:mm"),
             end: moment("2010-10-21 16:00", "YYYY-MM-DD HH:mm")
           }
@@ -276,14 +198,6 @@ var j = [
   }
 ]
 
-//How many Hours are the workers available?
-// var workerTimes = []
-// for (var i = 0; i < workers.length; i++) {
-//   workerTimes.push(workers[i].length);
-// }
-
-// duration(j.typeOf);
-
 //Gives a random value including of min range and ONLY LESSER THAN the max limit
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -327,11 +241,19 @@ function getRandomInt(min, max) {
 function getSimilarTimes(wArr, jArr) {
      var returnArray = []
 
+
+
   for(i of wArr){
-    if(i.start.isSame(jArr.data.start)){
-       returnArray.push(i.start)
+    // if(i.start.isSame(jArr.data.start)){
+    //    returnArray.push(i.start)
+    // }
+
+    if ((jArr.data.start).isSameOrAfter(moment(i.start)) &&
+    (jArr.data.end).isSameOrBefore(moment(i.end)) ) {
+      returnArray.push(i.start)
     }
   }
+
   if (returnArray.length === 1) {
       return returnArray[0];
     } else if (returnArray.length === 0) {
@@ -394,17 +316,20 @@ function fitness(solution, callback) {
       var w = solution[i].wid
       var wst = workers[w].shifts
       for(var y = 0; y< workers[w].shifts.length;y++){
-        if ((j[i].data.start).isSame(moment(workers[w].shifts[y].start))) {
+        if ((j[i].data.start).isSameOrAfter(moment(workers[w].shifts[y].start)) &&
+        (j[i].data.end).isSameOrBefore(moment(workers[w].shifts[y].end)) ) {
         score = score + 1;
         // }
-      }}
+      }
+    }
 
   }
-      //Do Solution's start time match with the Job's availability start time
+//Do Solution's start time match with the Job's availability start time
   for (var i = 0; i < j.length; i++) {
     //console.log(solution.aT)
     // if( typeof solution.aT != "undefined"){
-    if (moment(solution[i].starttime).isSame((j[i].data.start))) {
+    if ( moment(solution[i].starttime).isSameOrAfter((j[i].data.start)) &&
+    (j[i].data.end).isSameOrAfter(moment(solution[i].starttime).add(j[i].duration,'h')) ) {
       score = score + 1;
       // }
     }
@@ -441,19 +366,18 @@ function fitness(solution, callback) {
 }
 function startCheck(solutionEle,i){
   if (solutionEle.starttime.isAfter(moment("1010-10-20 11:00"))){
-
-    if (moment(solutionEle.starttime).isSame((j[i].data.start))) {
-
-      var w = solutionEle.wid
-      var wst = workers[w].shifts
-      for(var y = 0; y< workers[w].shifts.length;y++){
-        if ((j[i].data.start).isSame(moment(workers[w].shifts[y].start))) {
-          return true;
+    //
+    // if (moment(solutionEle.starttime).isSame((j[i].data.start))) {
+    //
+    //   var w = solutionEle.wid
+    //   var wst = workers[w].shifts
+    //   for(var y = 0; y< workers[w].shifts.length;y++){
+    //     if ((j[i].data.start).isSame(moment(workers[w].shifts[y].start))) {
+           return true;
         // }
-      }
-    }
-  }
-} else{
+    //   }
+    // }
+  } else{
     return false;
   }
 
@@ -517,7 +441,7 @@ function mutate(solution, callback) {
     // if( typeof solution.aT != "undefined"){
 
 
-    if (Math.random() < 0.3) {
+    if (Math.random() < 0.3 && (startCheck(solution[i],i)===false ) ) {
       solution[i].wid = getRandomInt(0, workers.length - 1)
 
       var returnShiftStart = [];
@@ -538,7 +462,7 @@ function mutate(solution, callback) {
 }
 
 function stopCriteria() {
-  return (this.generation == 10);
+  return (this.generation == 100);
 }
 
 console.log('=== TEST BEGINS === ');

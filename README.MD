@@ -1,8 +1,8 @@
 // Always use "npm i --save" after downloading
-#Scheduling does not work ATM
+#Scheduling does work ATM
 
 // We have now written our own library in Scheduling.js
-//To run, use "node index5.js"
+//To run, use "node Scheduling.js"
 
 
 Check data:

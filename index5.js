@@ -13,8 +13,202 @@ var Task = genetic.Task,
     crossover: crossover
   },
   util = require('util')
+//data set 2 for July 2018
+  // var workers = [
+  //   { //worker0
+  //     id: 10,
+  //     pos: 0,
+  //     shifts: [
+  //       {
+  //         start: moment("2018-07-01 09:00", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-01 14:00", "YYYY-MM-DD HH:mm")
+  //       }, {
+  //         start: moment("2018-07-02 10:00", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-02 11:00", "YYYY-MM-DD HH:mm")
+  //       }
+  //       // ,
+  //       // {
+  //       //   start: moment("2018-07-02 17:00", "YYYY-MM-DD HH:mm"),
+  //       //   end: moment("2018-07-02 19:00", "YYYY-MM-DD HH:mm")
+  //       // }
+  //     ]
+  //   }, { //worker1
+  //     id: 20,
+  //     pos: 1,
+  //     shifts: [
+  //       // {
+  //       //   start: moment("2018-07-01 15:00", "YYYY-MM-DD HH:mm"),
+  //       //   end: moment("2018-07-01 17:00", "YYYY-MM-DD HH:mm")
+  //       // },
+  //       {
+  //         start: moment("2018-07-02 10:00 ", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-02 17:00", "YYYY-MM-DD HH:mm")
+  //     //  }, {
+  //       //   start: moment("2010-10-22 08:00 ", "YYYY-MM-DD HH:mm"),
+  //       //   end: moment("2010-10-22 12:00", "YYYY-MM-DD HH:mm")
+  //      }
+  //     ]
+  //   },
+  //    { //worker2
+  //     id: 30,
+  //     pos: 2,
+  //     shifts: [
+  //       {
+  //         start: moment("2018-07-01 14:00 ", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-01 18:00", "YYYY-MM-DD HH:mm")
+  //       },{
+  //         start: moment("2018-07-02 12:00 ", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-02 14:00", "YYYY-MM-DD HH:mm")
+  //       }
+  //     ]
+  //   },
+  //   { //worker3
+  //     id: 30,
+  //     pos: 3,
+  //     shifts: [
+  //       { //worker3
+  //         start: moment("2018-07-02 17:00 ", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-02 19:00", "YYYY-MM-DD HH:mm")
+  //       },
+  //       { //worker3
+  //         start: moment("2018-07-01 19:00 ", "YYYY-MM-DD HH:mm"),
+  //         end: moment("2018-07-01 20:15", "YYYY-MM-DD HH:mm")
+  //       }
+  //     ]
+  //   },
+    // {//worker3
+    //   id: 30,
+    //   pos: 4,
+    //   shifts: [
+    //     { //worker4
+    //       start: moment("2010-10-20 17:00 ", "YYYY-MM-DD HH:mm"),
+    //       end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
+    //     },
+    //     {
+    //           start: moment("2010-10-21 14:00 ", "YYYY-MM-DD HH:mm"),
+    //           end: moment("2010-10-21 16:00", "YYYY-MM-DD HH:mm")
+    //         }
+    //       ]
+    //     }
+  //]
+//data set 2 for July 2018
+  // var j = [
+  //   // {
+  //   //   jid: 1,
+  //   //   duration: 2,
+  //   //   data: {
+  //   //     start: moment("2018-07-01 09:00", "YYYY-MM-DD HH:mm"),
+  //   //     end: moment("2018-07-01 11:00", "YYYY-MM-DD HH:mm")
+  //   //   }
+  //   //
+  //   // },
+  //   {
+  //     jid: 1,
+  //     duration : 2,
+  //     data:{
+  //       start: moment("2018-07-01 09:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-01 11:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //     {
+  //     jid: 2,
+  //     duration: 2,
+  //     data: {
+  //       start: moment("2018-07-01 11:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-01 13:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //
+  //   }, {
+  //     jid: 3,
+  //     duration: 1,
+  //     data: {
+  //       start: moment("2018-07-01 06:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-01 07:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //
+  //   },
+  //   {
+  //     jid: 4,
+  //     duration: 1.5,
+  //     data: {
+  //       start: moment("2018-07-02 09:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 10:30", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 5,
+  //     duration: 2,
+  //     data: {
+  //       start: moment("2018-07-02 12:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 14:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 6,
+  //     duration: 1,
+  //     data: {
+  //       start: moment("2018-07-01 15:30", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-01 16:30", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 7,
+  //     duration: 1.5,
+  //     data: {
+  //       start: moment("2018-07-01 14:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-01 15:30", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 8,
+  //     duration: 2,
+  //     data: {
+  //       start: moment("2018-07-02 14:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 16:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 9,
+  //     duration: 1.5,
+  //     data: {
+  //       start: moment("2018-07-02 10:30", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 12:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   }
+  //   ,{
+  //     jid: 10,
+  //     duration: 1,
+  //     data: {
+  //       start: moment("2018-07-02 16:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 17:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },{
+  //     jid: 11,
+  //     duration: 2,
+  //     data: {
+  //       start: moment("2018-07-02 17:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 19:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 12,
+  //     duration: 1,
+  //     data: {
+  //       start: moment("2018-07-02 17:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-02 18:00", "YYYY-MM-DD HH:mm")
+  //     }
+  //   },
+  //   {
+  //     jid: 13,
+  //     duration: 2.15,
+  //     data: {
+  //       start: moment("2018-07-01 19:00", "YYYY-MM-DD HH:mm"),
+  //       end: moment("2018-07-01 20:15", "YYYY-MM-DD HH:mm")
+  //     }
+  //   }
+  // ]
 
-
+//data set 1 for Oct 2010
 var workers = [
   { //worker0
     id: 10,
@@ -94,18 +288,8 @@ var workers = [
 //Duration of Task in Hours
 //var duration = [1, 1, 2];
 
-var predecessor = [
-  0,
-  1,
-  0,
-  0,
-  2,
-  1,
-  1
-];
-
 //Machine Availability times Start Times (Every Hour)
-
+//data set 1 2010 Oct
 var j = [
   {
     jid: 1,
@@ -203,54 +387,15 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-//Returns a random hour during which both the worker and machine are available
-// function getSimilarTimes(arr1, arr2) {
-//   //  console.log("sss");
-//   var returnArray = []
-//
-//   for (var i = 0; i < arr1.length; i++) {
-//     //  console.log("getSimilarTimes");
-//     //  console.log("arr2", arr2)
-//     //  console.log(arr1)
-//     //  console.log(arr2)
-//     console.log("arr1", i,arr1,arr2)
-//
-//
-//
-//     if ((arr1[i].start).isSameOrBefore(moment(arr2.data.start)) && ((arr1[i].end).isSameOrAfter(moment(arr2.data.start).add(arr2.duration, "h")))) {
-//
-//       if ((arr1[i].start).isSameOrAfter((arr2.data.start))) {
-//         returnArray.push(arr1[i].start)
-//       } else {
-//         returnArray.push(arr2.data.start)
-//       }
-//     }
-//   //  console.log(returnArray)
-//   }
-//
-//   //console.log(returnArray)
-//   if (returnArray.length == 1) {
-//     return returnArray[0];
-//   } else if (returnArray.length == 0) {
-//     //  returns an easily identifiable value with year 1000, to indicate infeasable solution
-//     return (moment("1010-10-20 11:00", "YYYY-MM-DD HH:mm"))
-//   } else {
-//     return returnArray[getRandomInt(0, returnArray.length - 1)]
-//   }
-// }
 function getSimilarTimes(wArr, jArr) {
+
      var returnArray = []
-
-
-
-  for(i of wArr){
-    // if(i.start.isSame(jArr.data.start)){
-    //    returnArray.push(i.start)
-    // }
-
-    if ((jArr.data.start).isSameOrAfter(moment(i.start)) &&
-    (jArr.data.end).isSameOrBefore(moment(i.end)) ) {
-      returnArray.push(i.start)
+     for(var i=0; i<wArr.length; i++){
+//  for(i of wArr){
+    //console.log('wArr === i',wArr,i)
+if ((jArr.data.start).isSameOrAfter(moment(wArr[i].start)) &&
+    (jArr.data.end).isSameOrBefore(moment(wArr[i].end)) ) {
+      returnArray.push(jArr.data.start)
     }
   }
 
@@ -278,35 +423,30 @@ function getRandomSolution(callback) {
   }
 
   for (var i = 0; i < solution.length; i++) {
-    //console.log(solution.aT)
-    // if( typeof solution.aT != "undefined"){
     var returnShiftStart = [];
     var ss = workers[solution[i].wid]
     for (var y of ss.shifts) {
-  //    console.log("zzz", y)
-
       returnShiftStart.push({start: y.start, end: y.end});
-      // }
-  //    console.log(returnShiftStart)
     }
-
     solution[i].starttime = getSimilarTimes(returnShiftStart, j[i])
-
   }
-
-  //console.log(solution)
   callback(solution)
 }
 
 function fitness(solution, callback) {
   //initialize the score as 0
   //5 Points added to score per successfull Match.
-  var score = 0;
+  var score = 1;
 
   //Check if there worker is available or not!
   for (i of solution) {
     if (moment(i.starttime).isAfter(moment("1010-10-20 11:00"))) {
       score = score + 3;
+    }
+    else {
+      if(moment(i.starttime).isSame(moment("1010-10-20 11:00"))){
+      //  score = score - 1;
+      }
     }
   }
   //worker start time and job start time match ?
@@ -325,26 +465,43 @@ function fitness(solution, callback) {
 
   }
 //Do Solution's start time match with the Job's availability start time
-  for (var i = 0; i < j.length; i++) {
-    //console.log(solution.aT)
-    // if( typeof solution.aT != "undefined"){
-    if ( moment(solution[i].starttime).isSameOrAfter((j[i].data.start)) &&// asubu should it be worker start time?
-    (j[i].data.end).isSameOrAfter(moment(solution[i].starttime).add(j[i].duration,'h')) ) {
-      score = score + 1;
-      // }
-    }
-  }
+  // for (var i = 0; i < j.length; i++) {
+  //   var w = solution[i].wid
+  //   var wst = workers[w].shifts
+  //   for(var y = 0; y< workers[w].shifts.length;y++){
+  //
+  //   //console.log(solution.aT)
+  //   // if( typeof solution.aT != "undefined"){
+  //   if ( (moment(workers[w].shifts.start).isSameOrBefore((j[i].data.start))) &&
+  //   // asubu should it be worker start time?
+  //   ((j[i].data.end).isSameOrBefore(moment(wst[y].end)))) {
+  //     score = score + 1;
+  //     // }
+  //   }
+  // }
+//}
    //asubu uncommented
   //Repetition, one worker should not be assigned 2 jobs at the same day and time.
   for (var l = 0; l < solution.length; l++) {
-    for ( var k = 0; k < solution.length; k++) {
-      if (k!= l) {
+    for ( var k = l+1; k < solution.length; k++) {
+      if (k!== l) {
         if(solution[k].wid === solution[l].wid) {
-          if((solution[l].starttime).isSame((solution[k].starttime)))
+          if(((solution[l].starttime).isSame(solution[k].starttime)))
           {
-        //  score = score - 1; //DOES NOT WORK
+          //  solution[l].starttime = moment("1000-10-20 11:00")
+          score = score - 1; //DOES NOT WORK
+
+          //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
+          }
+          else {
+            //not same start time but before or after means allow.
+            //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
+            if(((j[l].data.end).isSameOrBefore(solution[k].starttime)) ||
+            ((j[k].data.end).isSameOrBefore(solution[l].starttime)))
+            score = score + 1
           }
         }
+
       }
 
     }
@@ -353,24 +510,25 @@ function fitness(solution, callback) {
   //Overlap, If one worker works from 10-12 on a job, he should not be assigned a differnt job at 11.
 
 
-  for (var l = 0; l < solution.length-1; l++) {
-    for (k = l+1; k < solution.length; k++) {
-      if (k != l && solution[k].wid == solution[l].wid) {
-        if (solution[k].starttime.isSameOrBefore(solution[l].starttime) && (moment(solution[k].starttime).add(j[k].duration, 'hours').isSameOrAfter(solution[l].starttime))) {
-          score = score - 1;
-        }
-
-      }
-
-    }
-  }
+  // for (var l = 0; l < solution.length; l++) {
+  //   for (k = l+1; k < solution.length; k++) {
+  //     if ((k !== l) && (solution[k].wid === solution[l].wid)) {
+  //       if (solution[k].starttime.isSameOrBefore(solution[l].starttime)
+  //       && (moment(solution[k].starttime).add(j[k].duration, 'hours').isSameOrAfter(solution[l].starttime))) {
+  //         score = score - 1;
+  //       }
+  //
+  //     }
+  //
+  //   }
+  // }
 
 
 
   callback(score)
 }
 function startCheck(solutionEle,i){
-  if (solutionEle.starttime.isAfter(moment("1010-10-20 11:00"))){
+  if (solutionEle.starttime.isSame(moment("1010-10-20 11:00"))){
     //
     // if (moment(solutionEle.starttime).isSame((j[i].data.start))) {
     //
@@ -378,20 +536,38 @@ function startCheck(solutionEle,i){
     //   var wst = workers[w].shifts
     //   for(var y = 0; y< workers[w].shifts.length;y++){
     //     if ((j[i].data.start).isSame(moment(workers[w].shifts[y].start))) {
-           return true;
+           return false;
         // }
     //   }
     // }
   } else{
-    return false;
+    return true;
   }
 
 }
+// function startCheck(solutionEle){
+//   if (solutionEle.starttime.isAfter(moment("1010-10-20 11:00"))){
+//
+//     // if (moment(solutionEle.starttime).isSame((j[i].data.start))) {
+//     //
+//     //   var w = solutionEle.wid
+//     //   var wst = workers[w].shifts
+//     //   for(var y = 0; y< workers[w].shifts.length;y++){
+//     //     if ((j[i].data.start).isSame(moment(workers[w].shifts[y].start))) {
+//            return true;
+//     //     }
+//     //   }
+//     // }
+//   } else{
+//     return false;
+//   }
+//
+// }
 function crossover(parent1, parent2, callback) {
   var child = parent1
   //  console.log(parent1)
   //if solution.starttime is  moment("1010-10-20 11:00") crossover else dont do anything
-
+  //
   for (i = 0; i < parent1.length; i++) {
     //asubu
     if (startCheck(parent1[i],i)=== true){
@@ -402,9 +578,8 @@ function crossover(parent1, parent2, callback) {
       child[i].jobid = parent2[i].jobid
       child[i].wid = parent2[i].wid
       child[i].starttime = parent2[i].starttime
-
   } else {
-    if (Math.random() > 0.5) {
+    if (Math.random() > 0.5)  {
       //console.log(child)
       child[i].jobid = parent1[i].jobid
       child[i].wid = parent1[i].wid
@@ -441,33 +616,25 @@ function mutate(solution, callback) {
 
 
   for (var i = 0; i < solution.length; i++) {
-    //console.log(solution.aT)
 
-    // if( typeof solution.aT != "undefined"){
-
-
-    if (Math.random() < 0.3 && (startCheck(solution[i],i)===false ) ) {
+    if (Math.random() < 0.3 && (startCheck(solution[i],i)=== false ) ) {
       solution[i].wid = getRandomInt(0, workers.length - 1)
 
       var returnShiftStart = [];
       var ss = workers[solution[i].wid]
       for (y of ss.shifts) {
-        //      console.log("XXXXX", y)
+      //console.log("score in mutate", solution[i].score)
         returnShiftStart.push({start: y.start, end: y.end});
-        //            console.log(returnShiftStart);
-        // }
       }
-
-        solution[i].starttime = getSimilarTimes(returnShiftStart, j[i])
+        //solution[i].starttime = moment(returnShiftStart[getRandomInt(0, returnShiftStart.length - 1)])
+ solution[i].starttime = getSimilarTimes(returnShiftStart, j[i])
     }
-
   }
-
   callback(solution)
 }
 
 function stopCriteria() {
-  return (this.generation == 100);
+  return (this.generation === 100);
 }
 
 console.log('=== TEST BEGINS === ');

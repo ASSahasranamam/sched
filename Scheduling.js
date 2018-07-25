@@ -89,81 +89,91 @@ var workers = [
 //data set 1 2010 Oct
 var j = [
   {
-    jid: 1,
+    jid: 0,
     duration: 2,
+    predecessor: [],
     data: {
       start: moment("2010-10-20 09:10", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-20 11:10", "YYYY-MM-DD HH:mm")
     }
 
   }, {
-    jid: 2,
+    jid: 1,
     duration: 1,
+    predecessor: [0],
     data: {
       start: moment("2010-10-21 08:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-21 09:00", "YYYY-MM-DD HH:mm")
     }
 
   }, {
-    jid: 3,
+    jid: 2,
     duration: 2,
+    predecessor: [1],
     data: {
       start: moment("2010-10-20 14:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
     }
 
   }, {
-    jid: 4,
+    jid: 3,
     duration: 3,
+    predecessor: [],
     data: {
       start: moment("2010-10-21 17:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 5,
+    jid: 4,
     duration: 2,
+    predecessor: [],
     data: {
       start: moment("2010-10-20 17:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-20 19:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 6,
+    jid: 5,
     duration: 2,
+    predecessor: [],
     data: {
       start: moment("2010-10-21 10:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-21 12:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 7,
+    jid: 6,
     duration: 1,
     data: {
       start: moment("2010-10-21 14:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-21 15:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 8,
+    jid: 7,
     duration: 1,
+    predecessor: [],
     data: {
       start: moment("2010-10-21 13:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-21 14:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 9,
+    jid: 8,
     duration: 1,
+    predecessor: [],
     data: {
       start: moment("2010-10-22 09:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-22 10:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 10,
+    jid: 9,
     duration: 2,
+    predecessor: [],
     data: {
       start: moment("2010-10-22 9:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-22 11:00", "YYYY-MM-DD HH:mm")
     }
   }, {
-    jid: 11,
+    jid: 10,
     duration: 1,
+    predecessor: [],
     data: {
       start: moment("2010-10-22 16:00", "YYYY-MM-DD HH:mm"),
       end: moment("2010-10-22 17:00", "YYYY-MM-DD HH:mm")
@@ -182,6 +192,9 @@ var predecessor = [
 ];
 
 //Machine Availability times Start Times (Every Hour)
+
+
+
 
 //Gives a random value including of min range and ONLY LESSER THAN the max limit
 function getRandomInt(min, max) {
@@ -394,7 +407,7 @@ function reproduce() {
 
     matingPool.push(population[i]);
   }
-  console.log('matingPool', matingPool)
+//  console.log('matingPool', matingPool)
 
   // for(var i =0; i< Math.floor(population.length * config.eliteness);i++){
   //   if(i < Math.floor(population.length  * config.eliteness)){
@@ -492,22 +505,52 @@ function mutate(solution) {
   return solution
 
 }
-
 function start() {
   createPop()
   console.log("=-TEST-START-=")
   var fittest = []
+  var bestScore=0;//best scrore in each iteration
+  var itBestScore=0; //no of consecutive iterations in which same bestScore was obtained.
+  var gen =0;// number of iterations in which we are stopping
+
+  // while(itBestScore<10){
+  //   population = sortJsonArray((population), 'score', 'des')
+  //   bestScore = population[0].score;
+  //   reproduce();
+  //   population = sortJsonArray((population), 'score', 'des');
+  //
+  //   if(bestScore === population[0].score){
+  //     itBestScore = itBestScore + 1;
+  //     console.log(itBestScore);
+  //   }
+  //   else {
+  //     itBestScore =0;
+  //     //reset the itBestScore here
+  //   }
+  //   gen = gen+1;
+  //
+  // }
+
   for (var i = 0; i < config.iterations; i++) {
 
     population = sortJsonArray((population), 'score', 'des')
     reproduce();
     population = sortJsonArray((population), 'score', 'des')
-    for (var y = 0; y < Math.floor(population.length * config.eliteness); y++) {
+
+
+
+
+    for (var y = 0; y < Math.floor(population.length); y++) {
+
+
       console.log('gen: ', i, 'Position : ', y, 'Score : ', population[y].score)
     }
   }
-  population = sortJsonArray((population), 'score', 'des')
+population = sortJsonArray((population), 'score', 'des')
   console.log("xxx", population[0])
+  console.log("genetration",gen);
+
+  //if(population[0].starttime isSame(moment(1010))) getAlternateStartforJob
 
 }
 

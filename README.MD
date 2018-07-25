@@ -1,10 +1,21 @@
+#Adi's cutom Written genetic Algorithm library for Gantt Task managent
+
+To Run :
+
+1. npm i --save
+2. node Scheduling2.js
+
+
+# www.linkedin.com/in/adiss
+ >>> Now accepting job offers!! <<<
+
+
 // Always use "npm i --save" after downloading
-#Scheduling does work ATM
+#Scheduling 1, 2 does work ATM
 
 // We have now written our own library in Scheduling.js
 //To run, use "node Scheduling.js"
 
 Scheduling2.js notes:
 
-1. GetSimilarTimes Need to be changed.
-2.
+---- > Section to be updated  < ----

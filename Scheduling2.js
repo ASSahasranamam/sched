@@ -156,7 +156,8 @@ function seed() {
     solution.push({
       jobid: i.jid,
       wid: getRandomInt(0, (workers.length - 1)),
-      wpos: []
+      wpos: [],
+      priority: 1
     })
     //  console.log(solution)
   }
@@ -182,6 +183,7 @@ function getSimilarTimes(jobid, solution) {
   } else {
     console.log(getjob[0])
     var x = getjob[0]
+    solution[x].priority = solution[x].priority + 2
     return solution[x].endtime
   }
 }
@@ -206,24 +208,39 @@ function fitness(solution) {
     for (st of sttimes.shifts) {
       if ((i.starttime).isSameOrAfter((st.start))) {
         if ((i.endtime).isSameOrBefore((st.end))) {
-          score = score + 1;
+          score = score + (i.priority * 1);
           break
         }
-      
+
       }
 
     }
 
   }
 
+  //there should not be 2 jobs starting at the same time
   for (var l = 0; l < solution.length; l++) {
     for (var k = l + 1; k < solution.length; k++) {
 
       if (solution[k].wid === solution[l].wid) {
         if (((solution[l].starttime).isSame(solution[k].starttime))) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
-//          score = score - 1; //DOES NOT WORK
+  //        score = score - 1;
+  //DOES NOT WORK as priority must be given to tasks predecessors
 
+
+
+          solution[k].wpos.push('overlap')
+          break
+          //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
+        } else if (((solution[l].starttime).isSameOrAfter(solution[k].starttime)) && (solution[l].starttime).isSameOrBefore(solution[k].endtime) ) {
+          //  solution[l].starttime = moment("1000-10-20 11:00")
+                  score = score - 1;
+  //DOES NOT WORK as priority must be given to tasks predecessors
+
+
+
+          solution[k].wpos.push('Partialoverlap')
           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
         }
     }
@@ -265,7 +282,7 @@ function crossover(parentA, parentB) {
   var child = parentA
 
   for (i = 0; i < child.length; i++) {
-
+    child[i].wpos=[]
     if (Math.random() > 0.5) {
       //console.log(child)
       child[i].wid = parentA[i].wid
@@ -317,9 +334,25 @@ function start() {
     reproduce();
 
   }
+  population = checkAndAdjust(population);
+
   population = sortJsonArray((population), 'score', 'des')
   console.log("xxx", population)
   console.log("Highest", population[0])
+}
+
+function checkAndAdjust(population){
+
+
+for(sol of population){
+  for(j of sol){
+    if(j.wpos.length > 0){
+        j.starttime = moment("1010-10-20 11:00")
+        j.endtime = moment("1010-10-20 11:00")
+    }
+  }
+}
+  return population
 }
 
 start();

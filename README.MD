@@ -22,9 +22,9 @@ Scheduling2.js notes:
  -------------------------------------------------------------------------
  <br>
 
- 
+
 ### -- > Now accepting job offers!! < --
-Please view my <a href=" www.linkedin.com/in/adiss/">linkedin</a> for more details about me!
+Please view my <a href="http://www.linkedin.com/in/adiss/">linkedin</a> for more details about me!
 
 All rights reserved.
 

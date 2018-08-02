@@ -1,5 +1,6 @@
  Adi's custom Written genetic Algorithm library for Gantt Task management
 
+Authored by: Adithya Subramanian Sahasranamam
 # To Run :
 
 > 1. npm i --save -g
@@ -18,14 +19,11 @@ Scheduling2.js notes:
 3. undefined occurs, need to fine-tune out the inconsistencies.
 4. Needs Rigorous updating
 
+ -------------------------------------------------------------------------
+ <br>
 
-About me:
-
-\n  Adithya Subramanian Sahasranamam,
-\n  www.github.com/assahasranamam/
-\n  www.linkedin.com/in/adiss/
-
-## -- > Now accepting job offers!! < --
+ 
+### -- > Now accepting job offers!! < --
 Please view my <a href=" www.linkedin.com/in/adiss/">linkedin</a> for more details about me!
 
 All rights reserved.

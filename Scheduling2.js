@@ -51,43 +51,43 @@ var jobs = {
       predecessor: [0]
 
     }
-    // , {
-    //   jid: 7,//release hardware
-    //   duration: 2,
-    //   predecessor: [6,5]
-    //
-    // }
-    // , {
-    //   jid: 8,//complete software
-    //   duration: 4,
-    //   predecessor: [6]
-    //
-    // }
-    // , {
-    //   jid: 9,//release manual
-    //   duration: 1,
-    //   predecessor: [4]
-    //
-    // }, {
-    //   jid: 10,//print manuals
-    //   duration: 4,
-    //   predecessor: [9]
-    //
-    // }, {
-    //   jid: 11,//Release software
-    //   duration: 1,
-    //   predecessor: [8]
-    //
-    // }, {
-    //   jid: 12,//Manufacture hardware
-    //   duration: 4,
-    //   predecessor: [7]
-    //
-    // }, {
-    //   jid: 13,//Deliver project
-    //   duration: 1,
-    //   predecessor: [10,11,12]
-    //   }
+    , {
+      jid: 7,//release hardware
+      duration: 2,
+      predecessor: [6,5]
+
+    }
+    , {
+      jid: 8,//complete software
+      duration: 4,
+      predecessor: [6]
+
+    }
+    , {
+      jid: 9,//release manual
+      duration: 1,
+      predecessor: [4]
+
+    }, {
+      jid: 10,//print manuals
+      duration: 4,
+      predecessor: [9]
+
+    }, {
+      jid: 11,//Release software
+      duration: 1,
+      predecessor: [8]
+
+    }, {
+      jid: 12,//Manufacture hardware
+      duration: 4,
+      predecessor: [7]
+
+    }, {
+      jid: 13,//Deliver project
+      duration: 1,
+      predecessor: [10,11,12]
+      }
     ]
 }
   var workers = [
@@ -326,19 +326,22 @@ function getSimilarTimes(jobid, solution) {
 var y = solution[jobid].wid
 for(s of workers[y].shifts){
 
-  if((solution[x].endtime).isSameOrAfter(s.start)){
-    if((solution[x].endtime).add(jobs[jobid],'h').isSameOrBefore(s.end)){
+  if(moment(solution[x].endtime).isSameOrAfter(s.start)){
+    if(moment(solution[x].endtime).add(jobs.list[jobid].duration,'h').isSameOrBefore(s.end)){
       return solution[x].endtime
       break
     }
   } else {
-    if(moment(s.start).isAfter(solution[x].endtime)){
-      if(moment(s.end).isAfter(solution[x].endtime.add(jobs[jobid],'h' ))) {
+    if(moment(s.start).isAfter(moment(solution[x].endtime))){
+      if(moment(s.end).isAfter(moment(solution[x].endtime).add(jobs.list[jobid].duration,'h' ))) {
         return s.start
       }
-    }
-  }
+    }else {
+      return moment('1010-10-20 11:00')
 
+    }
+
+  }
 
 }
 
@@ -365,8 +368,9 @@ function fitness(solution) {
     for (st of sttimes.shifts) {
 
       if (moment(i.starttime).isSameOrAfter(moment(st.start))) { //after Worker Start time
+
         if (moment(i.endtime).isSameOrBefore(moment(st.end))) {  //before Worker End time
-          score = score + (i.priority * 1);
+          score = score + (i.priority * 2);
           break;
           }
         }
@@ -382,7 +386,7 @@ function fitness(solution) {
       if (solution[k].wid === solution[l].wid) {
         if ((moment(solution[l].starttime).isSame(moment(solution[k].starttime)))) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
-          score = score - 1;
+          score = score - (1 * solution[l].priority);
   //DOES NOT WORK as priority must be given to tasks predecessors
 
 
@@ -392,7 +396,7 @@ function fitness(solution) {
           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
         } else if ((moment(solution[l].starttime).isSameOrAfter(moment(solution[k].starttime))) && moment(solution[l].starttime).isSameOrBefore(moment(solution[k].endtime)) ) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
-                  score = score - 1;
+                  score = score - (2 * solution[k].priority);
   //DOES NOT WORK as priority must be given to tasks predecessors
 
 

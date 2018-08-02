@@ -8,136 +8,275 @@ var config = {
   "crossover": 0.5,
   "mutation": 0.05,
   "eliteness": 0.2
-};
+}
 
-//data set 1 for Oct 2010
-var workers = [
-  { //worker0
-    id: 10,
-    pos: 0,
-    shifts: [
-      {
-        start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
-      }, {
-        start: moment("2010-10-20 14:00", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
-      }
-    ]
-  }, { //worker1
-    id: 20,
-    pos: 1,
-    shifts: [
-      {
-        start: moment("2010-10-20 13:00", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
-      }, {
-        start: moment("2010-10-21 08:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
-      }, {
-        start: moment("2010-10-22 08:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-22 12:00", "YYYY-MM-DD HH:mm")
-      }
-    ]
-  }, { //worker2
-    id: 30,
-    pos: 2,
-    shifts: [
-      {
-        start: moment("2010-10-20 08:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
-      }, {
-        start: moment("2010-10-22 11:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-22 14:00", "YYYY-MM-DD HH:mm")
-      }
-    ]
-  }, { //worker3
-    id: 30,
-    pos: 3,
-    shifts: [
-      { //worker3
-        start: moment("2010-10-21 11:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 13:00", "YYYY-MM-DD HH:mm")
-      }, { //worker3
-        start: moment("2010-10-21 15:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 19:00", "YYYY-MM-DD HH:mm")
-      }, { //worker3
-        start: moment("2010-10-22 09:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-22 17:00", "YYYY-MM-DD HH:mm")
-      }
-    ]
-  }, { //worker4
-    id: 30,
-    pos: 4,
-    shifts: [
-      { //worker4
-        start: moment("2010-10-20 17:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
-      }, {
-        start: moment("2010-10-21 14:00 ", "YYYY-MM-DD HH:mm"),
-        end: moment("2010-10-21 16:00", "YYYY-MM-DD HH:mm")
-      }
-    ]
-  }
-]
 
 var jobs = {
-  projStart: moment("2010-10-20 09:10", "YYYY-MM-DD HH:mm"),
-  projDeadline: moment("2010-10-23 09:10", "YYYY-MM-DD HH:mm"),
+  projStart: moment("2018-08-01 08:00", "YYYY-MM-DD HH:mm"),
+  projDeadline: moment("2018-08-03 20:00", "YYYY-MM-DD HH:mm"),
   list: [
     {
-      jid: 0,
-      duration: 2,
+      jid: 0,//formalise specs
+      duration: 6,
       predecessor: []
     }, {
-      jid: 1,
-      duration: 1,
+      jid: 1,//design hardware
+      duration: 4,
       predecessor: [0]
     }, {
-      jid: 2,
+      jid: 2,//layout manual
+      duration: 3,
+      predecessor: [0]
+    }, {
+      jid: 3,//breadboard hardware
       duration: 2,
       predecessor: [1]
-    }, {
-      jid: 3,
-      duration: 3,
+
+    }
+    , {
+      jid: 4,//finish manual
+      duration: 4,
       predecessor: [2]
 
-    }, {
-      jid: 4,
-      duration: 2,
-      predecessor: []
+    }
+    , {
+      jid: 5,//test hardware
+      duration: 3,
+      predecessor: [3]
+
+    }
+    , {
+      jid: 6,//design software
+      duration: 6,
+      predecessor: [0]
 
     }
     // , {
-    //   jid: 5,
+    //   jid: 7,//release hardware
     //   duration: 2,
-    //   predecessor: []
-    // }, {
-    //   jid: 6,
-    //   duration: 1,
-    //   predecessor: []
-    // }, {
-    //   jid: 7,
-    //   duration: 1,
-    //   predecessor: []
-    // }, {
-    //   jid: 8,
-    //   duration: 1,
-    //   predecessor: []
-    //   }
-    // , {
-    //   jid: 9,
-    //   duration: 2,
-    //   predecessor: []
-    // }, {
-    //   jid: 10,
-    //   duration: 1,
-    //   predecessor: []
+    //   predecessor: [6,5]
+    //
     // }
-  ]
+    // , {
+    //   jid: 8,//complete software
+    //   duration: 4,
+    //   predecessor: [6]
+    //
+    // }
+    // , {
+    //   jid: 9,//release manual
+    //   duration: 1,
+    //   predecessor: [4]
+    //
+    // }, {
+    //   jid: 10,//print manuals
+    //   duration: 4,
+    //   predecessor: [9]
+    //
+    // }, {
+    //   jid: 11,//Release software
+    //   duration: 1,
+    //   predecessor: [8]
+    //
+    // }, {
+    //   jid: 12,//Manufacture hardware
+    //   duration: 4,
+    //   predecessor: [7]
+    //
+    // }, {
+    //   jid: 13,//Deliver project
+    //   duration: 1,
+    //   predecessor: [10,11,12]
+    //   }
+    ]
 }
+  var workers = [
+    { //worker0
+      id: 5,
+      pos: 0,
+      shifts: [
+        {
+          start: moment("2018-08-01 10:00", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-01 20:00", "YYYY-MM-DD HH:mm")
+        }, {
+          start: moment("2018-08-02 13:00", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-02 20:00", "YYYY-MM-DD HH:mm")
+        }
+      ]
+    }, { //worker1
+      id: 10,
+      pos: 1,
+      shifts: [
+        {
+          start: moment("2018-08-01 13:00", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-01 20:00", "YYYY-MM-DD HH:mm")
+        }, {
+          start: moment("2018-08-02 08:00 ", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-02 20:00", "YYYY-MM-DD HH:mm")
+        }, {
+          start: moment("2018-08-03 08:00 ", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-03 12:00", "YYYY-MM-DD HH:mm")
+        }
+      ]
+    }, { //worker2
+      id: 20,
+      pos: 2,
+      shifts: [
+        {
+          start: moment("2018-08-01 08:00", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-01 14:00", "YYYY-MM-DD HH:mm")
+        }, {
+          start: moment("2018-08-01 15:00 ", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-01 20:00", "YYYY-MM-DD HH:mm")
+        }
+      ]
+    }, { //worker3
+      id: 30,
+      pos: 3,
+      shifts: [
+        { //worker3
+          start: moment("2018-08-01 15:00", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-01 20:00", "YYYY-MM-DD HH:mm")
+        }, { //worker3
+          start: moment("2018-08-02 08:00 ", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-02 19:00", "YYYY-MM-DD HH:mm")
+        },
+        { //worker3
+          start: moment("2018-08-03 10:00 ", "YYYY-MM-DD HH:mm"),
+          end: moment("2018-08-03 20:00", "YYYY-MM-DD HH:mm")
+        },
+      ]
+    }
+      ]
 
-//gets predecessor
+// //data set 1 for Oct 2010
+// var workers = [
+//   { //worker0
+//     id: 10,
+//     pos: 0,
+//     shifts: [
+//       {
+//         start: moment("2010-10-20 10:00", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
+//       }, {
+//         start: moment("2010-10-20 14:00", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
+//       }
+//     ]
+//   }, { //worker1
+//     id: 20,
+//     pos: 1,
+//     shifts: [
+//       {
+//         start: moment("2010-10-20 13:00", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-20 16:00", "YYYY-MM-DD HH:mm")
+//       }, {
+//         start: moment("2010-10-21 08:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-21 20:00", "YYYY-MM-DD HH:mm")
+//       }, {
+//         start: moment("2010-10-22 08:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-22 12:00", "YYYY-MM-DD HH:mm")
+//       }
+//     ]
+//   }, { //worker2
+//     id: 30,
+//     pos: 2,
+//     shifts: [
+//       {
+//         start: moment("2010-10-20 08:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-20 12:00", "YYYY-MM-DD HH:mm")
+//       }, {
+//         start: moment("2010-10-22 11:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-22 14:00", "YYYY-MM-DD HH:mm")
+//       }
+//     ]
+//   }, { //worker3
+//     id: 30,
+//     pos: 3,
+//     shifts: [
+//       { //worker3
+//         start: moment("2010-10-21 11:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-21 13:00", "YYYY-MM-DD HH:mm")
+//       }, { //worker3
+//         start: moment("2010-10-21 15:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-21 19:00", "YYYY-MM-DD HH:mm")
+//       }, { //worker3
+//         start: moment("2010-10-22 09:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-22 17:00", "YYYY-MM-DD HH:mm")
+//       }
+//     ]
+//   }, { //worker4
+//     id: 30,
+//     pos: 4,
+//     shifts: [
+//       { //worker4
+//         start: moment("2010-10-20 17:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-20 20:00", "YYYY-MM-DD HH:mm")
+//       }, {
+//         start: moment("2010-10-21 14:00 ", "YYYY-MM-DD HH:mm"),
+//         end: moment("2010-10-21 16:00", "YYYY-MM-DD HH:mm")
+//       }
+//     ]
+//   }
+// ]
+//
+// var jobs = {
+//   projStart: moment("2010-10-20 09:10", "YYYY-MM-DD HH:mm"),
+//   projDeadline: moment("2010-10-23 09:10", "YYYY-MM-DD HH:mm"),
+//   list: [
+//     {
+//       jid: 0,
+//       duration: 2,
+//       predecessor: []
+//     }, {
+//       jid: 1,
+//       duration: 1,
+//       predecessor: [0]
+//     }, {
+//       jid: 2,
+//       duration: 2,
+//       predecessor: [1]
+//     }, {
+//       jid: 3,
+//       duration: 3,
+//       predecessor: [2]
+//
+//     }, {
+//       jid: 4,
+//       duration: 2,
+//       predecessor: []
+//
+//     }
+//     // , {
+//     //   jid: 5,
+//     //   duration: 2,
+//     //   predecessor: []
+//     // }, {
+//     //   jid: 6,
+//     //   duration: 1,
+//     //   predecessor: []
+//     // }, {
+//     //   jid: 7,
+//     //   duration: 1,
+//     //   predecessor: []
+//     // }, {
+//     //   jid: 8,
+//     //   duration: 1,
+//     //   predecessor: []
+//     //   }
+//     // , {
+//     //   jid: 9,
+//     //   duration: 2,
+//     //   predecessor: []
+//     // }, {
+//     //   jid: 10,
+//     //   duration: 1,
+//     //   predecessor: []
+//     // }
+//   ]
+// }
+//
+// //gets predecessor
 
 function getPred(job) {
   return job.predecessor
@@ -155,7 +294,7 @@ function seed() {
   for (i of jobs.list) {
     solution.push({
       jobid: i.jid,
-      wid: getRandomInt(0, (workers.length - 1)),
+      wid: getRandomInt(0, workers.length -1 ),
       wpos: [],
       priority: 1
     })
@@ -184,7 +323,25 @@ function getSimilarTimes(jobid, solution) {
     console.log(getjob[0])
     var x = getjob[0]
     solution[x].priority = solution[x].priority + 2
-    return solution[x].endtime
+var y = solution[jobid].wid
+for(s of workers[y].shifts){
+
+  if((solution[x].endtime).isSameOrAfter(s.start)){
+    if((solution[x].endtime).add(jobs[jobid],'h').isSameOrBefore(s.end)){
+      return solution[x].endtime
+      break
+    }
+  } else {
+    if(moment(s.start).isAfter(solution[x].endtime)){
+      if(moment(s.end).isAfter(solution[x].endtime.add(jobs[jobid],'h' ))) {
+        return s.start
+      }
+    }
+  }
+
+
+}
+
   }
 }
 
@@ -204,17 +361,17 @@ function fitness(solution) {
 
   for (i of solution) {
     var sttimes = workers[i.wid];
-    console.log(sttimes)
+    console.log(sttimes)//worker times
     for (st of sttimes.shifts) {
-      if ((i.starttime).isSameOrAfter((st.start))) {
-        if ((i.endtime).isSameOrBefore((st.end))) {
-          score = score + (i.priority * 1);
-          break
-        }
 
+      if (moment(i.starttime).isSameOrAfter(moment(st.start))) { //after Worker Start time
+        if (moment(i.endtime).isSameOrBefore(moment(st.end))) {  //before Worker End time
+          score = score + (i.priority * 1);
+          break;
+          }
+        }
       }
 
-    }
 
   }
 
@@ -223,9 +380,9 @@ function fitness(solution) {
     for (var k = l + 1; k < solution.length; k++) {
 
       if (solution[k].wid === solution[l].wid) {
-        if (((solution[l].starttime).isSame(solution[k].starttime))) {
+        if ((moment(solution[l].starttime).isSame(moment(solution[k].starttime)))) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
-  //        score = score - 1;
+          score = score - 1;
   //DOES NOT WORK as priority must be given to tasks predecessors
 
 
@@ -233,7 +390,7 @@ function fitness(solution) {
           solution[k].wpos.push('overlap')
           break
           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
-        } else if (((solution[l].starttime).isSameOrAfter(solution[k].starttime)) && (solution[l].starttime).isSameOrBefore(solution[k].endtime) ) {
+        } else if ((moment(solution[l].starttime).isSameOrAfter(moment(solution[k].starttime))) && moment(solution[l].starttime).isSameOrBefore(moment(solution[k].endtime)) ) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
                   score = score - 1;
   //DOES NOT WORK as priority must be given to tasks predecessors
@@ -245,6 +402,11 @@ function fitness(solution) {
         }
     }
   }
+}
+
+
+if(solution[solution.length-1].endtime.isSameOrBefore(jobs.projDeadline) ){
+  score = score + 20
 }
 
   return score
@@ -338,6 +500,8 @@ function start() {
 
   population = sortJsonArray((population), 'score', 'des')
   console.log("xxx", population)
+  population = sortJsonArray((population), 'score', 'des')
+
   console.log("Highest", population[0])
 }
 
@@ -347,8 +511,9 @@ function checkAndAdjust(population){
 for(sol of population){
   for(j of sol){
     if(j.wpos.length > 0){
-        j.starttime = moment("1010-10-20 11:00")
-        j.endtime = moment("1010-10-20 11:00")
+
+      //  j.starttime = moment("1010-10-20 11:00")
+      //  j.endtime = moment("1010-10-20 11:00")
     }
   }
 }

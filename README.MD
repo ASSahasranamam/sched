@@ -20,11 +20,12 @@ Scheduling2.js notes:
 
 
 About me:
-  Adithya Subramanian Sahasranamam,
-  www.github.com/assahasranamam/
-  www.linkedin.com/in/adiss/
 
-# -- > Now accepting job offers!! < --
+\n  Adithya Subramanian Sahasranamam,
+\n  www.github.com/assahasranamam/
+\n  www.linkedin.com/in/adiss/
+
+## -- > Now accepting job offers!! < --
 Please view my <a href=" www.linkedin.com/in/adiss/">linkedin</a> for more details about me!
 
 All rights reserved.

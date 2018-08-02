@@ -16,9 +16,9 @@ Scheduling2.js notes:
 
 1. Can't have more than 1 tasks without a predecessor
 2. Can't have tasks not in order for the input
-3. undefined occurs, need to fine-tune out the inconsistencies.
+3. need to fine-tune out the inconsistencies.
 4. Needs Rigorous updating
-
+5. The data always induces overlap
  -------------------------------------------------------------------------
  <br>
 

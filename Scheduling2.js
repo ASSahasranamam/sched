@@ -331,22 +331,22 @@ for(s of workers[y].shifts){
       return solution[x].endtime
       break
     }
-  } else {
-    if(moment(s.start).isAfter(moment(solution[x].endtime))){
+  } else if(moment(s.start).isAfter(moment(solution[x].endtime))){
       if(moment(s.end).isAfter(moment(solution[x].endtime).add(jobs.list[jobid].duration,'h' ))) {
         return s.start
       }
-    }else {
+    }
+    else {
       return moment('1010-10-20 11:00')
+
+        }
+
+      }
 
     }
 
   }
 
-}
-
-  }
-}
 
 function createPop() {
 
@@ -396,7 +396,7 @@ function fitness(solution) {
           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
         } else if ((moment(solution[l].starttime).isSameOrAfter(moment(solution[k].starttime))) && moment(solution[l].starttime).isSameOrBefore(moment(solution[k].endtime)) ) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
-                  score = score - (2 * solution[k].priority);
+                  score = score - (2 * solution[l].priority);
   //DOES NOT WORK as priority must be given to tasks predecessors
 
 

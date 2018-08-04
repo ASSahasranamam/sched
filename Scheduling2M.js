@@ -3,8 +3,8 @@ var sortJsonArray = require('sort-json-array');
 require('sanic.js').changeMyWorld();
 
 var config = {
-  "iterations": 500,
-  "size": 100,
+  "iterations": 100,
+  "size": 500,
   "crossover": 0.5,
   "mutation": 0.05,
   "eliteness": 0.2
@@ -55,7 +55,6 @@ var jobs = {
       jid: 7,//release hardware
       duration: 2,
       predecessor: [6,5]
-      //predecessor: [6]
 
     }
     , {
@@ -88,7 +87,6 @@ var jobs = {
       jid: 13,//Deliver project
       duration: 1,
       predecessor: [10,11,12]
-      //predecessor: [12]
       }
     ]
 }
@@ -117,7 +115,7 @@ var jobs = {
           end: moment("2018-08-02 20:00", "YYYY-MM-DD HH:mm")
         }, {
           start: moment("2018-08-03 08:00 ", "YYYY-MM-DD HH:mm"),
-          end: moment("2018-08-03 20:00", "YYYY-MM-DD HH:mm")
+          end: moment("2018-08-03 12:00", "YYYY-MM-DD HH:mm")
         }
       ]
     }, { //worker2
@@ -126,15 +124,10 @@ var jobs = {
       shifts: [
         {
           start: moment("2018-08-01 08:00", "YYYY-MM-DD HH:mm"),
-          end: moment("2018-08-01 15:00", "YYYY-MM-DD HH:mm")
-        },
-        {
+          end: moment("2018-08-01 14:00", "YYYY-MM-DD HH:mm")
+        }, {
           start: moment("2018-08-01 15:00 ", "YYYY-MM-DD HH:mm"),
           end: moment("2018-08-01 20:00", "YYYY-MM-DD HH:mm")
-        }
-        ,{
-          start: moment("2018-08-02 10:00", "YYYY-MM-DD HH:mm"),
-          end: moment("2018-08-02 14:00", "YYYY-MM-DD HH:mm")
         }
       ]
     }, { //worker3
@@ -149,7 +142,7 @@ var jobs = {
           end: moment("2018-08-02 19:00", "YYYY-MM-DD HH:mm")
         },
         { //worker3
-          start: moment("2018-08-03 08:00 ", "YYYY-MM-DD HH:mm"),
+          start: moment("2018-08-03 10:00 ", "YYYY-MM-DD HH:mm"),
           end: moment("2018-08-03 20:00", "YYYY-MM-DD HH:mm")
         },
       ]
@@ -295,26 +288,13 @@ function getRandomInt(min, max) {
 }
 
 var population = [];
-var bestPopulation = []
-var bbscore=[]
+
 function seed() {
   var solution = [];
-  //for tasks without predecessor allocate user with earliest shift
   for (i of jobs.list) {
-    var getjob = getPred(jobs.list[i.jid])
-
-    var seedworker
-    if (getjob.length ===0){
-      //here assign the worker whose shift start time is as close as possible to project start time
-      seedworker = getRandomInt(0, workers.length -1 )
-    }
-    else {
-      seedworker = getRandomInt(0, workers.length -1 )
-    }
     solution.push({
       jobid: i.jid,
-      wid: seedworker,
-      //lag: 0,
+      wid: getRandomInt(0, workers.length -1 ),
       wpos: [],
       priority: 1
     })
@@ -334,6 +314,7 @@ function seed() {
   return solution;
 
 }
+
 function getSimilarTimes(jobid, solution) {
   var getjob = getPred(jobs.list[jobid])
 
@@ -355,7 +336,7 @@ for(s of workers[y].shifts){
     }
   } else if(moment(s.start).isAfter(moment(possibleEndDate))){
       if(moment(s.end).isAfter(moment(possibleEndDate).add(jobs.list[jobid].duration,'h' ))) {
-    //    console.log("jobid, worker start date, possibleenddate",solution[jobid],moment(s.start),moment(possibleEndDate))
+        console.log("jobid, worker start date, possibleenddate",solution[jobid],moment(s.start),moment(possibleEndDate))
         return moment(s.start)
       }
     }
@@ -370,35 +351,6 @@ for(s of workers[y].shifts){
 
     }
 
-  //}
-  // this methode used to get the greatest end date
-
-function hmGAGetLatestEndDatePredecessorForJobId(jobid, solution) {
-
-    var predecessorTasks = getPred(jobs.list[jobid])
-
-    if (predecessorTasks.length === 0) {
-
-      return jobs.projStart
-
-    } else {
-for (var prejobId of predecessorTasks) {
-      var tempStartDate = jobs.projStart
-      solution[prejobId].priority = solution[prejobId].priority + 1
-
-        if (moment(solution[prejobId].endtime).isAfter(tempStartDate)) {
-
-          tempStartDate = solution[prejobId].endtime
-        }
-      }
-
-      return tempStartDate
-
-    }
-
-}
-
-
 
 function createPop() {
 
@@ -411,31 +363,18 @@ function createPop() {
 
 function fitness(solution) {
   var score = 1;
-  //if first task starts with hte project start time, add points
-  // if (moment(solution[0].starttime).isSame(moment(jobs.projStart)))
-  // {
-  //   score = score + 1
-  // }
-  for (i of solution) {
+  //initialize the score as 0
+  //5 Points added to score per successfull Match.
 
-    // if(moment(i.starttime).isSame(moment(jobs.projStart))){
-    //   score = score + 2;
-    // }
-    var getjob = getPred(i.jobid)
-    //add additional points if successor is scheduled immediately after end date of predecessor.
-    var predMaxEndDate = hmGAGetLatestEndDatePredecessorForJobId(i.jobid, solution)
-    if (moment(predMaxEndDate).isSame(i.starttime)) {
-      //score = score + 1
-    }
-    var sttimes = workers[i.wid]; //get worker shift times
-    //console.log(sttimes)//worker times
+  for (i of solution) {
+    var sttimes = workers[i.wid];
+    console.log(sttimes)//worker times
     for (st of sttimes.shifts) {
 
       if (moment(i.starttime).isSameOrAfter(moment(st.start))) { //after Worker Start time
 
         if (moment(i.endtime).isSameOrBefore(moment(st.end))) {  //before Worker End time
           score = score + (i.priority * 2);
-          //score = score +10
           break;
           }
         }
@@ -449,59 +388,40 @@ function fitness(solution) {
     for (var k = l + 1; k < solution.length; k++) {
 
       if (solution[k].wid === solution[l].wid) {
-        if ((moment(solution[l].starttime).isSame(moment(solution[k].starttime))))
-      {// if start dates are same for both the tasks.
-          //  solution[l].starttime = moment("1000-10-20 11:00")
-          score = score - (1 * solution[l].priority);
-          solution[k].wpos.push('overlap ' + l )
-          solution[l].wpos.push('overlap ' + k )
 
+        if ((moment(solution[l].starttime).isSame(moment(solution[k].starttime)))) {
+          //  solution[l].starttime = moment("1000-10-20 11:00")
+          score = score - (3 * solution[l].priority);
+  //DOES NOT WORK as priority must be given to tasks predecessors
+
+          solution[k].wpos.push('overlap')
           break
           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
+        } else if ((moment(solution[l].starttime).isSameOrAfter(moment(solution[k].starttime))) && moment(solution[l].starttime).isSameOrBefore(moment(solution[k].endtime)) ) {
+          //  solution[l].starttime = moment("1000-10-20 11:00")
+                  score = score - (3 * solution[l].priority);
+  //DOES NOT WORK as priority must be given to tasks predecessors
+
+          solution[k].wpos.push('Partialoverlap')
+          //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
         }
-         else {
-         if ((moment(solution[l].starttime).isAfter(moment(solution[k].starttime))) && moment(solution[l].endtime).isSameOrBefore(moment(solution[k].endtime)) ) {
-//           //  solution[l].starttime = moment("1000-10-20 11:00")
-                 score = score - (1 * solution[l].priority);
-//   //DOES NOT WORK as priority must be given to tasks predecessors
-// //score = score -2
-            solution[k].wpos.push('Partialoverlap')
-//           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
-//         }
     }
   }
 }
-}}
 
 
-// if(solution[solution.length-1].endtime.isSameOrBefore(jobs.projDeadline) ){
-//   score = score + 5
-// }
+if(solution[solution.length-1].endtime.isSameOrBefore(jobs.projDeadline) ){
+  score = score + 20
+}
 
   return score
 }
 
 //
 //
-//alternate sorting function
-var sort_by = function(field, reverse, primer){
-
-					   var key = primer ?
-					       function(x) {return primer(x[field])} :
-					       function(x) {return x[field]};
-
-					   reverse = !reverse ? 1 : -1;
-
-					   return function (a, b) {
-					       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-					   }
-				}
-
 function reproduce() {
 
-  var matingPool = [];
-  // ArrayList which we will use for our "mating pool"
-
+  var matingPool = []; // ArrayList which we will use for our "mating pool"
 
   for (i of population) {
 
@@ -511,37 +431,32 @@ function reproduce() {
   }
 
   for (i = 0; i < population.length; i++) {
+    var child;
     var a = getRandomInt(0, matingPool.length - 1);
     var b = getRandomInt(0, matingPool.length - 1);
     var parentA = matingPool[a];
     var parentB = matingPool[b];
-    var child = crossover(parentA, parentB);
-     mutate(child);
+    //  child = crossover(parentA, parentB);
+    //  mutate(child);
+    child = parentA
     child.score = fitness(child);
     population[i] = child;
-
   }
-  //population = sortJsonArray(population, 'score', 'des')
-  //population.sort(sort_by('score', false, parseInt));
 
-
-
-//console.log(" iterations",population[0])
 }
 
 function crossover(parentA, parentB) {
   var child = parentA
 
-  console.log(child)
   for (i = 0; i < child.length; i++) {
     child[i].wpos=[]
     if (Math.random() > 0.5) {
       //console.log(child)
       child[i].wid = parentA[i].wid
-      child[i].starttime = moment(parentA[i].starttime)
+      child[i].starttime = parentA[i].starttime
     } else {
       child[i].wid = parentB[i].wid
-      child[i].starttime = moment(parentB[i].starttime)
+      child[i].starttime = parentB[i].starttime
     }
 
   }
@@ -557,12 +472,12 @@ function mutate(solution) {
 
       var wstart = solution[i].wid
       if (workers[wstart].shifts.length === 1) {
-        solution[i].starttime === moment(workers[wstart].starttime)
+        solution[i].starttime === workers[wstart].starttime
       } else {
         var sttimes = []
 
         for (st of workers[wstart].shifts) {
-          sttimes.push(moment(st.starttime))
+          sttimes.push(st.starttime)
         }
 
         solution[i].starttime = sttimes[getRandomInt(0, sttimes.length - 1)]
@@ -583,79 +498,70 @@ function start() {
   var MaxScore = 0;
   for (var i = 0; i < config.iterations; i++) {
     // while( fittest<5){
-  //  population = sortJsonArray((population), 'score', 'des')
-    //console.log('pre repo score :  ', population[0].score)
-    population.sort(sort_by('score', true, parseInt));
-
     reproduce();
-    //population = sortJsonArray(population, 'score', 'des')
-    population.sort(sort_by('score', true, parseInt));
-
-    console.log('Max Score of gen:  ', i, population[0].score)
-    bestPopulation.push(population[0])
-    bbscore.push(population[0].score)
-
-    console.log('score pushed : ', bestPopulation[bestPopulation.length-1].score  )
-    console.log('Min Score of gen :  ', i, population[population.length-1].score)
-    bestPopulation.sort(sort_by('score', true, parseInt))
-    console.log('bestScore so far', bestPopulation[0].score)
-
 
   }
-    population = checkAndAdjust(population);
+  population = checkAndAdjust(population);
 
-  console.log(" iterations", i)
-  //population = sortJsonArray((population), 'score' )
-  population.sort(sort_by('score', true, parseInt));
-//  bestPopulation.sort(sort_by('score', true, parseInt));
+  population = sortJsonArray((population), 'score', 'des')
+  console.log("xxx", population)
+  population = sortJsonArray((population), 'score', 'des')
 
+  console.log("Highest", population[0])
+}
 
-  console.log("Highest", population[0].score)
+// this methode used to get the greatest end date
 
-  bestPopulation.sort(function(a, b){
-    return b.score - a.score
-  })
+function hmGAGetLatestEndDatePredecessorForJobId(jobid, solution) {
 
-  console.log("Highest BEST population : ", bestPopulation[0].length, bestPopulation[0].score)
-//  console.log("Highest BEST population", bestPopulation[bestPopulation.length-1])
-bbscore.sort(function(a, b){
-  return b-a
-})
-  console.log("Best Score: ",bbscore)
+    var predecessorTasks = getPred(jobs.list[jobid])
+
+    if (predecessorTasks.length === 0) {
+
+      return jobs.projStart
+
+    } else {
+
+      var tempStartDate = jobs.projStart
+
+      for (var prejobId of predecessorTasks) {
+
+        solution[prejobId].priority = solution[prejobId].priority + 2
+
+        if (moment(solution[prejobId].endtime).isAfter(tempStartDate)) {
+
+          tempStartDate = solution[prejobId].endtime
+        }
+      }
+
+      return tempStartDate
+
+    }
+
 }
 
 
-  function checkAndAdjust(population){
+function checkAndAdjust(population){
 
-//  bestPopulation =  bestPopulation.sort(sort_by('score', true, parseInt));
-  console.log('with return based', bestPopulation[0].score)
-  //console.log(bestPopulation)
-  for(sol of population){
-    var value = "0"
-    for(j of sol){
-      if(j.wpos.length > 0){
-        value = "1"
-      }
-      if (value == "0") {
-      //  console.log("Best Values", sol.score)
-      }
+
+for(sol of population){
+  var value = "0"
+  for(j of sol){
+    if(j.wpos.length > 0){
+
+       // j.starttime = moment("1010-10-20 11:00")
+      //  j.endtime = moment("1010-10-20 11:00")
+      value = "1"
     }
+  }
 
+  if (value == "0") {
+
+    console.log("Best Values", sol)
 
   }
-    return population
-  }
-//function checkAndAdjust(population){
-// for(sol of population){
-//   for(j of sol){
-//     if(j.wpos.length > 0){
-//
-//       //  j.starttime = moment("1010-10-20 11:00")
-//       //  j.endtime = moment("1010-10-20 11:00")
-//     }
-//   }
-// }
-//   return population
-// }
+}
+  return population
+}
 
 start();

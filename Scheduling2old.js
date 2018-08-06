@@ -3,8 +3,8 @@ var sortJsonArray = require('sort-json-array');
 require('sanic.js').changeMyWorld();
 
 var config = {
-  "iterations": 10,
-  "size": 10,
+  "iterations": 100,
+  "size": 100,
   "crossover": 0.5,
   "mutation": 0.05,
   "eliteness": 0.2
@@ -304,16 +304,18 @@ function seed() {
     var getjob = getPred(jobs.list[i.jid])
 
     var seedworker
-    // if (getjob.length ===0){
-    //   //here assign the worker whose shift start time is as close as possible to project start time
-    //   seedworker = getRandomInt(0, workers.length -1 )
-    // }
-    // else {
-    //   seedworker = getRandomInt(0, workers.length -1 )
-    // }
+    if (getjob.length ===0){
+      //here assign the worker whose shift start time is as close as possible to project start time
+      seedworker = getRandomInt(0, workers.length -1)
+
+
+    }
+    else {
+      seedworker = getRandomInt(0, workers.length -1 )
+    }
     solution.push({
       jobid: i.jid,
-      wid: getRandomInt(0, workers.length -1 ),
+      wid: seedworker,
       //lag: 0,
       wpos: [],
       priority: 1
@@ -321,11 +323,10 @@ function seed() {
     //  console.log(solution)
   }
 
-  solution[0].starttime = moment(jobs.projStart)
-  solution[0].endtime =(solution[0].starttime).add(jobs.list[0].duration, 'h')
-//No moment Req. Above ^^
+  //solution[0].starttime = moment(jobs.projStart)
+  //solution[0].endtime = moment(solution[0].starttime).add(jobs.list[0].duration, 'h')
 
-  for (var i = 1; i < solution.length; i++) {
+  for (var i = 0; i < solution.length; i++) {
     //solution[i].starttime = moment("1010-10-20 11:00")
     solution[i].starttime = getSimilarTimes(solution[i].jobid, solution)
     solution[i].endtime = moment(solution[i].starttime).add(jobs.list[i].duration, 'h')
@@ -335,67 +336,71 @@ function seed() {
   return solution;
 
 }
-
 function getSimilarTimes(jobid, solution) {
   var getjob = getPred(jobs.list[jobid])
 
+  var possibleEndDate = hmGAGetLatestEndDatePredecessorForJobId(jobid, solution)
+
   if (getjob.length === 0) {
-    return jobs.projStart
-  } else {
-    console.log(getjob[0])
-    var x = getjob[0]
-    solution[x].priority = solution[x].priority + 2
+    possibleEndDate = jobs.projStart
+  }
+    // fails if no worker is available at start time.
+  // } else {
+    // console.log(getjob[0])
+    // var x = getjob[0]
+    // solution[x].priority = solution[x].priority + 2
 var y = solution[jobid].wid
 for(s of workers[y].shifts){
 
-  if((solution[x].endtime).isSameOrAfter(s.start)){
-    if((solution[x].endtime).add(jobs.list[jobid].duration,'h').isSameOrBefore(s.end)){
-      return moment(solution[x].endtime)
+  if(moment(possibleEndDate).isSameOrAfter(s.start)){
+    if(moment(possibleEndDate).add(jobs.list[jobid].duration,'h').isSameOrBefore(s.end)){
+      return moment(possibleEndDate)
       break
     }
-  } else if((s.start).isAfter(moment(solution[x].endtime))){
-      if(moment(s.end).isAfter((solution[x].endtime).add(jobs.list[jobid].duration,'h' ))) {
+  } else if(moment(s.start).isAfter(moment(possibleEndDate))){
+      if(moment(s.end).isAfter(moment(possibleEndDate).add(jobs.list[jobid].duration,'h' ))) {
+    //    console.log("jobid, worker start date, possibleenddate",solution[jobid],moment(s.start),moment(possibleEndDate))
         return moment(s.start)
       }
     }
     else {
-      return moment('1010-10-20 11:00')
+      return moment('1010-10-20 11:00', "YYYY-MM-DD HH:mm")
 
         }
 
       }
 
+      return moment(possibleEndDate)
+
     }
 
-  }
-
+  //}
   // this methode used to get the greatest end date
-//
-// function hmGAGetLatestEndDatePredecessorForJobId(jobid, solution) {
-//
-//     var predecessorTasks = getPred(jobs.list[jobid])
-//
-//     if (predecessorTasks.length === 0) {
-//
-//       return jobs.projStart
-//
-//     }
-//     else {
-// for (var prejobId of predecessorTasks) {
-//       var tempStartDate = jobs.projStart
-//       solution[prejobId].priority = solution[prejobId].priority + 1
-//
-//         if (moment(solution[prejobId].endtime).isAfter(tempStartDate)) {
-//
-//           tempStartDate = solution[prejobId].endtime
-//         }
-//       }
-//
-//       return tempStartDate
-//
-//     }
-//
-// }
+
+function hmGAGetLatestEndDatePredecessorForJobId(jobid, solution) {
+
+    var predecessorTasks = getPred(jobs.list[jobid])
+
+    if (predecessorTasks.length === 0) {
+
+      return jobs.projStart
+
+    } else {
+for (var prejobId of predecessorTasks) {
+      var tempStartDate = jobs.projStart
+      solution[prejobId].priority = solution[prejobId].priority + 1
+
+        if (moment(solution[prejobId].endtime).isAfter(tempStartDate)) {
+
+          tempStartDate = solution[prejobId].endtime
+        }
+      }
+
+      return tempStartDate
+
+    }
+
+}
 
 
 
@@ -422,10 +427,10 @@ function fitness(solution) {
     // }
     var getjob = getPred(i.jobid)
     //add additional points if successor is scheduled immediately after end date of predecessor.
-    //var predMaxEndDate = hmGAGetLatestEndDatePredecessorForJobId(i.jobid, solution)
-    // if (moment(predMaxEndDate).isSame(i.starttime)) {
-    //   score = score + 1
-    // }
+    var predMaxEndDate = hmGAGetLatestEndDatePredecessorForJobId(i.jobid, solution)
+    if (moment(predMaxEndDate).isSame(i.starttime)) {
+      //score = score + 1
+    }
     var sttimes = workers[i.wid]; //get worker shift times
     //console.log(sttimes)//worker times
     for (st of sttimes.shifts) {
@@ -433,7 +438,7 @@ function fitness(solution) {
       if (moment(i.starttime).isSameOrAfter(moment(st.start))) { //after Worker Start time
 
         if (moment(i.endtime).isSameOrBefore(moment(st.end))) {  //before Worker End time
-          score = score + (i.priority * 5);
+          score = score + (i.priority * 2);
           //score = score +10
           break;
           }
@@ -448,10 +453,9 @@ function fitness(solution) {
     for (var k = l + 1; k < solution.length; k++) {
 
       if (solution[k].wid === solution[l].wid) {
-        if ((moment(solution[l].starttime).isSame((solution[k].starttime))))
+        if ((moment(solution[l].starttime).isSame(moment(solution[k].starttime))))
       {// if start dates are same for both the tasks.
           //  solution[l].starttime = moment("1000-10-20 11:00")
-
           score = score - (1 * solution[l].priority);
           solution[k].wpos.push('overlap ' + l )
           solution[l].wpos.push('overlap ' + k )
@@ -474,9 +478,9 @@ function fitness(solution) {
 }}
 
 
-if(solution[solution.length-1].endtime.isSameOrBefore(jobs.projDeadline) ){
-  score = score + 1
-}
+// if(solution[solution.length-1].endtime.isSameOrBefore(jobs.projDeadline) ){
+//   score = score + 5
+// }
 
   return score
 }
@@ -529,104 +533,23 @@ function reproduce() {
 //console.log(" iterations",population[0])
 }
 
-
 function crossover(parentA, parentB) {
   var child = parentA
 
+  console.log(child)
   for (i = 0; i < child.length; i++) {
     child[i].wpos=[]
     if (Math.random() > 0.5) {
       //console.log(child)
       child[i].wid = parentA[i].wid
-      child[i].starttime = parentA[i].starttime
-      child[i].endtime = parentA[i].endtime
-
+      child[i].starttime = moment(parentA[i].starttime)
     } else {
       child[i].wid = parentB[i].wid
-      child[i].starttime = parentB[i].starttime
-      child[i].endtime = parentB[i].endtime
-
+      child[i].starttime = moment(parentB[i].starttime)
     }
 
   }
   return child
-}
-
-function mutate(solution) {
-
-  for (var i = 0; i < solution.length; i++) {
-
-    if (Math.random() < config.mutation) {
-      solution[i].wid = getRandomInt(0, workers.length - 1)
-
-      var wstart = solution[i].wid
-      if (workers[wstart].shifts.length === 1) {
-        solution[i].starttime === workers[wstart].starttime
-      } else {
-        var sttimes = []
-
-        for (st of workers[wstart].shifts) {
-          sttimes.push(st.starttime)
-        }
-
-        solution[i].starttime = sttimes[getRandomInt(0, sttimes.length - 1)]
-        solution[i].endtime = moment(solution[i].starttime).add(jobs.list[i].duration, 'h')
-
-      }
-
-    }
-  }
-
-  return solution
-}
-
-function start() {
-  createPop()
-  console.log("=-TEST-START-=")
-  var fittest = 0;
-  var MaxScore = 0;
-  for (var i = 0; i < config.iterations; i++) {
-    // while( fittest<5){
-    reproduce();
-
-  }
-  population = checkAndAdjust(population);
-
-  population = sortJsonArray((population), 'score', 'des')
-  console.log("xxx", population)
-  population = sortJsonArray((population), 'score', 'des')
-
-  console.log("Highest", population[0])
-}
-
-// this methode used to get the greatest end date
-
-function hmGAGetLatestEndDatePredecessorForJobId(jobid, solution) {
-
-    var predecessorTasks = getPred(jobs.list[jobid])
-
-    if (predecessorTasks.length === 0) {
-
-      return jobs.projStart
-
-    } else {
-
-      var tempStartDate = jobs.projStart
-
-      for (var prejobId of predecessorTasks) {
-
-        solution[prejobId].priority = solution[prejobId].priority + 2
-
-        if (moment(solution[prejobId].endtime).isAfter(tempStartDate)) {
-
-          tempStartDate = solution[prejobId].endtime
-        }
-      }
-
-      return tempStartDate
-
-    }
-
 }
 
 function mutate(solution) {
@@ -657,53 +580,11 @@ function mutate(solution) {
   return solution
 }
 
-function start1() {
-
-  createPop()
-  console.log("=-TEST-START-=")
-  var fittest = 0;
-  var MaxScore = 0;
-
-  for (var i = 0; i < config.iterations; i++) {
-
-       population.sort(sort_by('score', true, parseInt));
-       reproduce();
-       population.sort(sort_by('score', true, parseInt));
-       console.log('Max Score of gen:  ', i, population[0].score)
-       bestPopulation.push(population[0])
-       bbscore.push(population[0].score)
-       bestPopulation.sort(sort_by('score', true, parseInt))
-       console.log("population[0]:::Score:" + population[0].score);
-  }
-
-  population = checkAndAdjust(population);
-  population.sort(sort_by('score', true, parseInt));
-  bestPopulation.sort(sort_by('score', true, parseInt));
-  bbscore.sort(function(a, b){
-    return b-a
-  })
-
-
-  // for (var i=0;i<population.length;i++) {
-  //   console.log("population:::Score:" + population[i].score);
-  // }
-  //
-  // for (var i=0;i<bestPopulation.length;i++) {
-  //   console.log("bestPopulation:::Score:" + bestPopulation[i].score);
-  // }
-  //
-  // for (var i=0;i<bbscore.length;i++) {
-  //   console.log("bbscore:::Score:" + bbscore[i]);
-  // }
-
-}
-
 function start() {
   createPop()
   console.log("=-TEST-START-=")
   var fittest = 0;
   var MaxScore = 0;
-
   for (var i = 0; i < config.iterations; i++) {
     // while( fittest<5){
   //  population = sortJsonArray((population), 'score', 'des')
@@ -721,8 +602,8 @@ function start() {
     console.log('score pushed : ', bestPopulation[bestPopulation.length-1].score  )
     console.log('Min Score of gen :  ', i, population[population.length-1].score)
     bestPopulation.sort(sort_by('score', true, parseInt))
-
     console.log('bestScore so far', bestPopulation[0].score)
+
 
   }
     population = checkAndAdjust(population);
@@ -734,38 +615,17 @@ function start() {
 
 
   console.log("Highest", population[0].score)
-  population.sort(sort_by('score', true, parseInt));
-  bestPopulation.sort(sort_by('score', true, parseInt));
-  bbscore.sort(function(a, b){
-    return b-a
-  })
-
 
   bestPopulation.sort(function(a, b){
-    return b.score - a.score;
+    return b.score - a.score
   })
 
-  console.log("Highest BEST population : ", bestPopulation[0], bestPopulation[0].score)
+  console.log("Highest BEST population : ", bestPopulation[0].length, bestPopulation[0].score)
 //  console.log("Highest BEST population", bestPopulation[bestPopulation.length-1])
 bbscore.sort(function(a, b){
-  return b-a;
+  return b-a
 })
-
-
-for (var i=0;i<population.length;i++) {
-  console.log("population:::Score:" + population[i].score);
-}
-
-for (var i=0;i<bestPopulation.length;i++) {
-  console.log("bestPopulation:::Score:" + bestPopulation[i].score);
-}
-
-for (var i=0;i<bbscore.length;i++) {
-  console.log("bbscore:::Score:" + bbscore[i]);
-}
-
-
-//  console.log("Best Score: ",bbscore)
+  console.log("Best Score: ",bbscore)
 }
 
 

@@ -4,7 +4,7 @@ require('sanic.js').changeMyWorld();
 
 var config = {
   "iterations": 100,
-  "size": 500,
+  "size": 100,
   "crossover": 0.5,
   "mutation": 0.05,
   "eliteness": 0.2
@@ -288,7 +288,8 @@ function getRandomInt(min, max) {
 }
 
 var population = [];
-
+var bestPopulation = [];
+var bbscore = [];
 function seed() {
   var solution = [];
   for (i of jobs.list) {
@@ -320,9 +321,10 @@ function getSimilarTimes(jobid, solution) {
 
   var possibleEndDate = hmGAGetLatestEndDatePredecessorForJobId(jobid, solution)
 
-  // if (getjob.length === 0) {
-  //   possibleEndDate = jobs.projStart   // fails if no worker is available at start time.
-  // } else {
+  if (getjob.length === 0) {
+    possibleEndDate = jobs.projStart   // fails if no worker is available at start time.
+  }
+   // else {
     // console.log(getjob[0])
     // var x = getjob[0]
     // solution[x].priority = solution[x].priority + 2
@@ -394,12 +396,17 @@ function fitness(solution) {
           score = score - (3 * solution[l].priority);
   //DOES NOT WORK as priority must be given to tasks predecessors
 
-          solution[k].wpos.push('overlap')
+            solution[k].wpos.push('overlap ' + l )
+            solution[l].wpos.push('overlap ' + k )
+
           break
           //console.log('repeat checking',l,k,solution[l].starttime,solution[k].starttime)
         } else if ((moment(solution[l].starttime).isSameOrAfter(moment(solution[k].starttime))) && moment(solution[l].starttime).isSameOrBefore(moment(solution[k].endtime)) ) {
           //  solution[l].starttime = moment("1000-10-20 11:00")
                   score = score - (3 * solution[l].priority);
+                  solution[k].wpos.push('Partialoverlap ' + l )
+                  solution[l].wpos.push('Partialoverlap ' + k )
+
   //DOES NOT WORK as priority must be given to tasks predecessors
 
           solution[k].wpos.push('Partialoverlap')
@@ -436,8 +443,8 @@ function reproduce() {
     var b = getRandomInt(0, matingPool.length - 1);
     var parentA = matingPool[a];
     var parentB = matingPool[b];
-    //  child = crossover(parentA, parentB);
-    //  mutate(child);
+      child = crossover(parentA, parentB);
+      mutate(child);
     child = parentA
     child.score = fitness(child);
     population[i] = child;
@@ -454,9 +461,13 @@ function crossover(parentA, parentB) {
       //console.log(child)
       child[i].wid = parentA[i].wid
       child[i].starttime = parentA[i].starttime
+      child[i].endtime = parentA[i].endtime
+
     } else {
       child[i].wid = parentB[i].wid
       child[i].starttime = parentB[i].starttime
+      child[i].endtime = parentB[i].endtime
+
     }
 
   }
@@ -498,7 +509,20 @@ function start() {
   var MaxScore = 0;
   for (var i = 0; i < config.iterations; i++) {
     // while( fittest<5){
+
     reproduce();
+    //population = sortJsonArray(population, 'score', 'des')
+    population.sort(sort_by('score', true, parseInt));
+
+    console.log('Max Score of gen:  ', i, population[0].score)
+    bestPopulation.push(population[0])
+    bbscore.push(population[0].score)
+
+    console.log('score pushed : ', bestPopulation[bestPopulation.length-1].score  )
+    console.log('Min Score of gen :  ', i, population[population.length-1].score)
+    bestPopulation.sort(sort_by('score', true, parseInt))
+
+    console.log('bestScore so far', bestPopulation[0].score)
 
   }
   population = checkAndAdjust(population);
@@ -508,6 +532,11 @@ function start() {
   population = sortJsonArray((population), 'score', 'des')
 
   console.log("Highest", population[0])
+
+  for (score of bbscore) {
+    console.log(score)
+  }
+
 }
 
 // this methode used to get the greatest end date
@@ -540,6 +569,18 @@ function hmGAGetLatestEndDatePredecessorForJobId(jobid, solution) {
 
 }
 
+var sort_by = function(field, reverse, primer){
+
+					   var key = primer ?
+					       function(x) {return primer(x[field])} :
+					       function(x) {return x[field]};
+
+					   reverse = !reverse ? 1 : -1;
+
+					   return function (a, b) {
+					       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+					   }
+				}
 
 function checkAndAdjust(population){
 
